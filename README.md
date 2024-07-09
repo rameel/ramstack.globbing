@@ -21,9 +21,9 @@ By default, the system's default path separators are used. You can override this
 
 | Name    | Description                                                                                                                                                                                                                              |
 |---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Auto    | Automatically determines whether to treat backslashes (`\\`) as escape sequences or path separators based on the platform's separator convention.                                                                                        |
-| Windows | Treats backslashes (`\\`) as path separators instead of escape sequences.<br>Provides behavior consistent with Windows-style paths.<br>Both backslashes (`\\`) and forward slashes (`/`) are considered as path separators in this mode. |
-| Unix    | Treats backslashes (`\\`) as escape sequences, allowing for special character escaping.<br>Provides behavior consistent with Unix-style paths.                                                                                           |
+| Auto    | Automatically determines whether to treat backslashes (`\ `) as escape sequences or path separators based on the platform's separator convention.                                                                                        |
+| Windows | Treats backslashes (`\ `) as path separators instead of escape sequences.<br>Provides behavior consistent with Windows-style paths.<br>Both backslashes (`\ `) and forward slashes (`/`) are considered as path separators in this mode. |
+| Unix    | Treats backslashes (`\ `) as escape sequences, allowing for special character escaping.<br>Provides behavior consistent with Unix-style paths.                                                                                           |
 
 Example with a specific flag:
 ```csharp
@@ -66,7 +66,7 @@ Brace patterns allow for matching multiple alternatives in a single pattern. Her
 
 ## Escaping characters
 
-The meta characters `?`, `*`, `[`, `\` can be escaped by using the `[]`, which means *match one character listed in the bracket*.
+The meta characters `?`, `*`, `[`, `\ ` can be escaped by using the `[]`, which means *match one character listed in the bracket*.
 * `[[]` matches the literal `[`
 * `[*]` matches the literal `*`
 
