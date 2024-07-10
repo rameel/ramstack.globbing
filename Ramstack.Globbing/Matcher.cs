@@ -156,17 +156,25 @@ public static unsafe class Matcher
             {
                 var pe = FindNextSlash<TFlags>(p, pend);
 
-                #if NET8_0_OR_GREATER
-                // Starting from .NET 8, JIT can efficiently perform checks with constant strings.
-                // This code ultimately transforms into a check with a number representing "**".
+                // In both systems (little-endian and big-endian), *(int*)"**" is 0x002A002A.
                 //
-                // Pseudocode:
-                // if (pattern.Length == 2 && *(int*)pattern == 0x2a002a)
-
-                if (MemoryMarshal.CreateSpan(ref *p, Length(p, pe)) is "**")
-                #else
-                if (Length(p, pe) == 2 && p[0] == '*' && p[1] == '*')
-                #endif
+                // 1. In UTF-16, the character '*' (asterisk) has the code 0x002A.
+                // 2. In memory, "**" will be represented as a sequence of two 16-bit values: 0x002A and 0x002A.
+                //
+                // 3. * In little-endian systems: 2A 00 2A 00
+                //    * In big-endian systems:    00 2A 00 2A
+                //
+                // 4. When we interpret these 4 bytes as an `int`, we get:
+                //    * In little-endian: 0x002A002A (bytes are read from right to left)
+                //    * In big-endian:    0x002A002A (bytes are read from left to right)
+                //
+                // Thus, despite the different byte order in memory, the numeric value interpreted
+                // as an `int` turns out to be the same in both cases.
+                //
+                // This occurs because:
+                // - Each '*' character occupies exactly 2 bytes in UTF-16.
+                // - The value of each character (0x002A) is symmetrical with respect to byte order.
+                if (Length(p, pe) == 2 && Unsafe.Read<int>(p) == ('*' << 16 | '*'))
                 {
                     p = SkipSlash<TFlags>(pe, pend);
 
