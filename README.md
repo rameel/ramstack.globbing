@@ -53,12 +53,12 @@ From [Wikipedia](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax)
 
 Brace patterns allow for matching multiple alternatives in a single pattern. Here are some key features:
 
-| Pattern        | Description                              | Example              | Matches                                         | Does not match |
-|----------------|------------------------------------------|----------------------|-------------------------------------------------|----------------|
-| {a,b,c}        | matches any of the comma-separated terms | file.{jpg,png}       | file.jpg, file.png                              | file.gif       |
-| {src,test{s,}} | supports nested brace patterns           | {src,test{s,}}/*.cs  | src/main.cs, tests/unit.cs, test/integration.cs | doc/readme.cs  |
-| {src,,test}    | supports empty alternatives              | {src,,test}/file.txt | src/file.txt, file.txt, test/file.txt           | doc/file.txt   |
-| {[sS]rc,test*} | supports full glob pattern within braces | {[sS]rc,test*}/*.cs  | src/app.cs, Src/main.cs, testing/script.cs      | lib/util.cs    |
+| Pattern        | Description                              | Example             | Matches                                         | Does not match |
+|----------------|------------------------------------------|---------------------|-------------------------------------------------|----------------|
+| {a,b,c}        | matches any of the comma-separated terms | file.{jpg,png}      | file.jpg, file.png                              | file.gif       |
+| {src,test{s,}} | supports nested brace patterns           | {src,test{s,}}/*.cs | src/main.cs, tests/unit.cs, test/integration.cs | doc/readme.cs  |
+| {main,,test}   | supports empty alternatives              | {main,,test}1.txt   | main1.txt, test1.txt, 1.txt                     | file1.txt      |
+| {[sS]rc,test*} | supports full glob pattern within braces | {[sS]rc,test*}/*.cs | src/app.cs, Src/main.cs, testing/script.cs      | lib/util.cs    |
 
 * Empty alternatives are valid, e.g., `{src,test,}` will also match paths without the listed prefixes.
 * Brace patterns can be nested, allowing for complex matching scenarios.
@@ -96,6 +96,12 @@ When using `MatchFlags.Unix`, an additional escape character (`\`) is available:
 We use optimizations that prevent quadratic behavior in scenarios like the pattern `a*a*a*a*a*a*a*a*a*c`
 matching against the text `aaaaaaaaaaaaaaa...aaaa...aaa`.
 Similarly, for the `a/**/a/**/a/**/.../a/**/a/**/a/**/b` pattern matching against `a/a/a/a/.../a/.../a`.
+
+## Changelog
+
+### 1.1.0
+- Change target framework from multi-targeting (`net6.0`;`net8.0`) to single target `net6.0`
+- Replace conditional compilation for `.NET 8` with a universal approach
 
 ## Supported versions
 
