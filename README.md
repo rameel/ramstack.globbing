@@ -97,6 +97,12 @@ We use optimizations that prevent quadratic behavior in scenarios like the patte
 matching against the text `aaaaaaaaaaaaaaa...aaaa...aaa`.
 Similarly, for the `a/**/a/**/a/**/.../a/**/a/**/a/**/b` pattern matching against `a/a/a/a/.../a/.../a`.
 
+## Changelog
+
+### 1.1.0
+- Change target framework from multi-targeting (`net6.0`;`net8.0`) to single target `net6.0`
+- Replace conditional compilation for `.NET 8` with a universal approach
+
 ## Supported versions
 
 |      | Version |
