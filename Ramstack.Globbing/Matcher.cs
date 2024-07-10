@@ -157,6 +157,12 @@ public static unsafe class Matcher
                 var pe = FindNextSlash<TFlags>(p, pend);
 
                 #if NET8_0_OR_GREATER
+                // Starting from .NET 8, JIT can efficiently perform checks with constant strings.
+                // This code ultimately transforms into a check with a number representing "**".
+                //
+                // Pseudocode:
+                // if (pattern.Length == 2 && *(int*)pattern == 0x2a002a)
+
                 if (MemoryMarshal.CreateSpan(ref *p, Length(p, pe)) is "**")
                 #else
                 if (Length(p, pe) == 2 && p[0] == '*' && p[1] == '*')
