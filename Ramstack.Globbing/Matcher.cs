@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -61,14 +60,10 @@ public static unsafe class Matcher
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsMatch(string pattern, string path, MatchFlags flags = MatchFlags.Auto)
     {
-        return IsMatch(
-            MemoryMarshal.CreateReadOnlySpan(
-                length: pattern.Length,
-                reference: ref Unsafe.AsRef(in pattern.GetPinnableReference())),
-            MemoryMarshal.CreateReadOnlySpan(
-                length: path.Length,
-                reference: ref Unsafe.AsRef(in path.GetPinnableReference())),
-            flags);
+        _ = pattern.Length;
+        _ = path.Length;
+
+        return IsMatch(pattern.AsSpan(), path.AsSpan(), flags);
     }
 
     /// <summary>
@@ -99,59 +94,20 @@ public static unsafe class Matcher
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsMatch(ReadOnlySpan<char> pattern, ReadOnlySpan<char> path, MatchFlags flags = MatchFlags.Auto)
     {
-        #if NET8_0_OR_GREATER
-
-        // short-circuit
-        //
-        // Starting from .NET 8, JIT can efficiently perform checks with constant strings.
-        // This code ultimately transforms into a check with numbers representing "**" and "**/*".
-        //
-        // Pseudocode:
-        // if (pattern.Length == 2 && *(int*)pattern == 0x2a002a
-        //     || pattern.Length == 4 && *(long*)pattern == 0x2a002f002a002a)
-
-        if (pattern is "**" or "**/*")
-            return true;
-
-        #endif
-
         fixed (char* p = &MemoryMarshal.GetReference(pattern))
         fixed (char* v = &MemoryMarshal.GetReference(path))
         {
-            #if !NET8_0_OR_GREATER
-
-            if (pattern.Length >= 2 && p[0] == '*' && p[1] == '*')
-                if (pattern.Length == 2 || pattern.Length == 4 && p[2] == '/' && p[3] == '*')
-                    return true;
-
-            #endif
-
             var pend = p + (uint)pattern.Length;
             var vend = v + (uint)path.Length;
 
             if (flags == MatchFlags.Windows || flags == MatchFlags.Auto && Path.DirectorySeparatorChar == '\\')
-            {
-                #if NET8_0_OR_GREATER
-
-                // short-circuit
-                if (pattern is @"**\*")
-                    return true;
-
-                #else
-
-                if (pattern.Length == 4 && p[0] == '*' && p[1] == '*' && p[2] == '\\' && p[3] == '*')
-                    return true;
-
-                #endif
-
                 return DoMatch<Windows>(p, pend, v, vend) == vend;
-            }
 
             return DoMatch<Unix>(p, pend, v, vend) == vend;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static int Subtract(char* s, char* e)
+        static int Length(char* s, char* e)
         {
             Debug.Assert((nint)s <= (nint)e);
 
@@ -176,7 +132,7 @@ public static unsafe class Matcher
         {
             if (p < pend)
             {
-                var n = Subtract(p, pend);
+                var n = Length(p, pend);
                 var s = MemoryMarshal.CreateSpan(ref *p, n);
                 var r = typeof(TFlags) == typeof(Windows)
                     ? s.IndexOfAny('/', '\\')
@@ -189,7 +145,6 @@ public static unsafe class Matcher
             return pend;
         }
 
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
         static char* DoMatch<TFlags>(char* p, char* pend, char* v, char* vend)
         {
             var level = 0;
@@ -202,9 +157,9 @@ public static unsafe class Matcher
                 var pe = FindNextSlash<TFlags>(p, pend);
 
                 #if NET8_0_OR_GREATER
-                if (MemoryMarshal.CreateSpan(ref *p, Subtract(p, pe)) is "**")
+                if (MemoryMarshal.CreateSpan(ref *p, Length(p, pe)) is "**")
                 #else
-                if (Subtract(p, pe) == 2 && p[0] == '*' && p[1] == '*')
+                if (Length(p, pe) == 2 && p[0] == '*' && p[1] == '*')
                 #endif
                 {
                     p = SkipSlash<TFlags>(pe, pend);
