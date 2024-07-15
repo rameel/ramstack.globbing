@@ -13,7 +13,7 @@ dotnet add package Ramstack.Globbing
 ## Usage
 
 ```csharp
-bool result = Matcher.IsMatch("wiki/**/*.md", "wiki/section-1/start.md");
+bool result = Matcher.IsMatch("wiki/section-1/start.md", "wiki/**/*.md");
 ```
 The `IsMatch` method attempts to match the specified path against the provided wildcard pattern.
 
@@ -27,7 +27,7 @@ By default, the system's default path separators are used. You can override this
 
 Example with a specific flag:
 ```csharp
-bool result = Matcher.IsMatch(@"wiki\**\*.md", "wiki/section-1/start.md", MatchFlags.Windows);
+bool result = Matcher.IsMatch("wiki/section-1/start.md", @"wiki\**\*.md", MatchFlags.Windows);
 ```
 
 ## Patterns
@@ -98,6 +98,23 @@ matching against the text `aaaaaaaaaaaaaaa...aaaa...aaa`.
 Similarly, for the `a/**/a/**/a/**/.../a/**/a/**/a/**/b` pattern matching against `a/a/a/a/.../a/.../a`.
 
 ## Changelog
+
+### 2.0.0
+**BREAKING CHANGE**
+
+To improve code readability and adherence to .NET conventions, the order of parameters in the `IsMatch` method has been changed.
+The `path` parameter is now first, followed by the `pattern` parameter.
+
+**New signature**
+```csharp
+public static bool IsMatch(string path, string pattern, MatchFlags flags = MatchFlags.Auto)
+```
+**Reasons for the change:**
+* Consistency with .NET methods: The primary object of an action is typically the first parameter.
+  Here, `path` is the primary object, and `pattern` is the secondary.
+* Alignment with common APIs: This order matches other .NET methods like `Regex.IsMatch(string input, string pattern)`.
+* Flexibility for future expansions: Having the most commonly varied parameter (pattern) second makes it easier to create intuitive method overloads in the future.
+* **Early stage of development:** Since the library is newly released, we've made this change to ensure consistency from the start.
 
 ### 1.1.0
 - Change target framework from multi-targeting (`net6.0`;`net8.0`) to single target `net6.0`
