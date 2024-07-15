@@ -102,7 +102,7 @@ Similarly, for the `a/**/a/**/a/**/.../a/**/a/**/a/**/b` pattern matching agains
 The `Files` class provides functionality for traversing the file system and retrieving lists of files and directories based on specified glob patterns. This allows for flexible and efficient file and directory enumeration.
 
 ```csharp
-using Ramstack.Globbing.Extensions;
+using Ramstack.Globbing.Traversal;
 
 // List all *.cs files
 var files = Files.EnumerateFiles(@"/path/to/directory", "**/*.cs");
@@ -117,7 +117,7 @@ foreach (var file in files)
 Support for multiple patterns is also included:
 
 ```csharp
-using Ramstack.Globbing.Extensions;
+using Ramstack.Globbing.Traversal;
 
 // List all *.cs files
 var files = Files.EnumerateFiles(@"/path/to/directory", ["src/**/*.cs", "lib/**/*.cs"], ["**/tests"]);
