@@ -97,9 +97,39 @@ We use optimizations that prevent quadratic behavior in scenarios like the patte
 matching against the text `aaaaaaaaaaaaaaa...aaaa...aaa`.
 Similarly, for the `a/**/a/**/a/**/.../a/**/a/**/a/**/b` pattern matching against `a/a/a/a/.../a/.../a`.
 
+## File traversal
+
+The `Files` class provides functionality for traversing the file system and retrieving lists of files and directories based on specified glob patterns. This allows for flexible and efficient file and directory enumeration.
+
+```csharp
+using Ramstack.Globbing.Traversal;
+
+// List all *.cs files
+var files = Files.EnumerateFiles(@"/path/to/directory", "**/*.cs");
+foreach (var file in files)
+    Console.WriteLine(file);
+
+// List all *.cs files except in tests directory
+var files = Files.EnumerateFiles(@"/path/to/directory", "**/*.cs", "tests");
+foreach (var file in files)
+    Console.WriteLine(file);
+```
+Support for multiple patterns is also included:
+
+```csharp
+using Ramstack.Globbing.Traversal;
+
+// List all *.cs files
+var files = Files.EnumerateFiles(@"/path/to/directory", ["src/**/*.cs", "lib/**/*.cs"], ["**/tests"]);
+foreach (var file in files)
+    Console.WriteLine(file);
+```
+
 ## Changelog
 
 ### 2.0.0
+* Added the ability to retrieve a list of files and directories based on a specified glob pattern.
+
 **BREAKING CHANGE**
 
 To improve code readability and adherence to .NET conventions, the order of parameters in the `IsMatch` method has been changed.
