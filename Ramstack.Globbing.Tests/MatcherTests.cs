@@ -294,7 +294,7 @@ public class MatcherTests
     [TestCase("*ac*ae*ag*",          "abacadaeafag",         ExpectedResult = true)]
     [TestCase("*ab*[cd]*e*f*g*",     "abacadaeafag",         ExpectedResult = true)]
     public bool IsMatchSegment(string pattern, string value) =>
-        Matcher.IsMatch(pattern, value, MatchFlags.Unix);
+        Matcher.IsMatch(value, pattern, MatchFlags.Unix);
 
     [TestCase("/dir", "/dir", ExpectedResult = true)]
     [TestCase("dir", "dir",   ExpectedResult = true)]
@@ -399,25 +399,25 @@ public class MatcherTests
     [TestCase("{[sS]rc,test*}/*.cs",  "unittest/app.cs",       ExpectedResult = false)]
     [TestCase("{[sS]rc,test*}/*.cs",  "test/app.cpp",          ExpectedResult = false)]
     public bool IsMatch(string pattern, string path) =>
-        Matcher.IsMatch(pattern, path, MatchFlags.Unix);
+        Matcher.IsMatch(path, pattern, MatchFlags.Unix);
 
     [TestCase(@"\a\b\*\d\e",  "ab*de", ExpectedResult = true)]
     [TestCase(@"\a\b\*\d\e",  "abcde", ExpectedResult = false)]
     public bool IsMatch_Unix(string pattern, string path) =>
-        Matcher.IsMatch(pattern, path, MatchFlags.Unix);
+        Matcher.IsMatch(path, pattern, MatchFlags.Unix);
 
     [TestCase(@"\a\b\*\d\e",  @"\a\b\c\d\e",   ExpectedResult = true)]
     [TestCase(@"\a\b\*\d\e",  @"/a/b\c/d/e",   ExpectedResult = true)]
     [TestCase(@"/a/b/*\d/e",  @"\a\b/c\d\e\",  ExpectedResult = true)]
     [TestCase(@"\a\b\*\d\e",  @"\a\b\c\d\e\f", ExpectedResult = false)]
     public bool IsMatch_Windows(string pattern, string path) =>
-        Matcher.IsMatch(pattern, path, MatchFlags.Windows);
+        Matcher.IsMatch(path, pattern, MatchFlags.Windows);
 
     [Test]
     public void Bang()
     {
-        Matcher.IsMatch("*.txt", new string('a', 10000) + ".txt");
-        Matcher.IsMatch("a*a*a*a*a*a*a*a*a*a*a*a*a*a*b", new string('a', 200));
-        Matcher.IsMatch("a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/b", string.Join("/", Enumerable.Repeat("a", 200)));
+        Matcher.IsMatch(new string('a', 10000) + ".txt", "*.txt");
+        Matcher.IsMatch(new string('a', 200), "a*a*a*a*a*a*a*a*a*a*a*a*a*a*b");
+        Matcher.IsMatch(string.Join("/", Enumerable.Repeat("a", 200)), "a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/a/**/b");
     }
 }
