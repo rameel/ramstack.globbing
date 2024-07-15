@@ -14,6 +14,7 @@ public static class Files
     /// <param name="path">The relative or absolute path to the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of files.</param>
     /// <param name="exclude">Optional glob pattern to exclude files.</param>
+    /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
     /// and that match the specified glob pattern.
@@ -66,8 +67,8 @@ public static class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFiles(string path, string pattern, string? exclude = null) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), 0, SearchTarget.Files);
+    public static IEnumerable<string> EnumerateFiles(string path, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, depth: 0, SearchTarget.Files);
 
     /// <summary>
     /// Enumerates files in a directory that match any of the specified glob patterns.
@@ -75,6 +76,7 @@ public static class Files
     /// <param name="path">The relative or absolute path to the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of files.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude files.</param>
+    /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
     /// and that match the specified glob patterns.
@@ -127,8 +129,8 @@ public static class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFiles(string path, string[] patterns, string[]? excludes = null) =>
-        EnumerateEntries(path, patterns, excludes ?? [], 0, SearchTarget.Files);
+    public static IEnumerable<string> EnumerateFiles(string path, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateEntries(path, patterns, excludes ?? [], flags, depth: 0, SearchTarget.Files);
 
     /// <summary>
     /// Enumerates directories in a directory that match the specified glob pattern.
@@ -136,6 +138,7 @@ public static class Files
     /// <param name="path">The relative or absolute path to the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of directories.</param>
     /// <param name="exclude">Optional glob pattern to exclude directories.</param>
+    /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
     /// and that match the specified glob pattern.
@@ -188,8 +191,8 @@ public static class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateDirectories(string path, string pattern, string? exclude = null) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), 0, SearchTarget.Directories);
+    public static IEnumerable<string> EnumerateDirectories(string path, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, depth: 0, SearchTarget.Directories);
 
     /// <summary>
     /// Enumerates directories in a directory that match any of the specified glob patterns.
@@ -197,6 +200,7 @@ public static class Files
     /// <param name="path">The relative or absolute path to the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of directories.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude directories.</param>
+    /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
     /// and that match the specified glob patterns.
@@ -249,8 +253,8 @@ public static class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateDirectories(string path, string[] patterns, string[]? excludes = null) =>
-        EnumerateEntries(path, patterns, excludes ?? [], 0, SearchTarget.Directories);
+    public static IEnumerable<string> EnumerateDirectories(string path, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateEntries(path, patterns, excludes ?? [], flags, depth: 0, SearchTarget.Directories);
 
     /// <summary>
     /// Returns an enumerable collection of file names and directory names that match a search pattern in a specified path.
@@ -258,6 +262,7 @@ public static class Files
     /// <param name="path">The relative or absolute path to the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of file-system entries in path.</param>
     /// <param name="exclude">Optional glob pattern to exclude file-system entries.</param>
+    /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
     /// and that match the specified glob pattern.
@@ -310,8 +315,8 @@ public static class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFileSystemEntries(string path, string pattern, string? exclude = null) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), 0, SearchTarget.Both);
+    public static IEnumerable<string> EnumerateFileSystemEntries(string path, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, depth: 0, SearchTarget.Both);
 
     /// <summary>
     /// Enumerates file-system entries (files and directories) in a directory that match any of the specified glob patterns.
@@ -319,6 +324,7 @@ public static class Files
     /// <param name="path">The relative or absolute path to the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of file-system entries.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude file-system entries.</param>
+    /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
     /// and that match the specified glob patterns.
@@ -371,16 +377,16 @@ public static class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFileSystemEntries(string path, string[] patterns, string[]? excludes = null) =>
-        EnumerateEntries(path, patterns, excludes ?? [], 0, SearchTarget.Both);
+    public static IEnumerable<string> EnumerateFileSystemEntries(string path, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateEntries(path, patterns, excludes ?? [], flags, depth: 0, SearchTarget.Both);
 
-    private static IEnumerable<string> EnumerateEntries(string path, string[] patterns, string[] excludes, int depth, SearchTarget target)
+    private static IEnumerable<string> EnumerateEntries(string path, string[] patterns, string[] excludes, MatchFlags flags, int depth, SearchTarget target)
     {
         path = Path.GetFullPath(path);
-        return EnumerateEntriesRecursive(path, path, patterns, excludes, depth, target);
+        return EnumerateEntriesRecursive(path, path, patterns, excludes, flags, depth, target);
     }
 
-    private static IEnumerable<string> EnumerateEntriesRecursive(string basePath, string directory, string[] patterns, string[] excludes, int depth, SearchTarget target)
+    private static IEnumerable<string> EnumerateEntriesRecursive(string basePath, string directory, string[] patterns, string[] excludes, MatchFlags flags, int depth, SearchTarget target)
     {
         foreach (var entry in Directory.EnumerateFileSystemEntries(directory))
         {
@@ -397,37 +403,37 @@ public static class Files
                 .ToString();
 
             if ((target & current) != 0
-                && !IsLeafMatch(normalizedPath, excludes)
-                &&  IsLeafMatch(normalizedPath, patterns))
+                && IsLeafMatch(normalizedPath, excludes, flags) == false
+                && IsLeafMatch(normalizedPath, patterns, flags))
                 yield return entry;
 
             if (current != SearchTarget.Directories)
                 continue;
 
-            if (IsLeafMatch(normalizedPath, excludes))
+            if (IsLeafMatch(normalizedPath, excludes, flags))
                 continue;
 
-            if (!IsPartialMatch(normalizedPath, patterns, depth))
+            if (!IsPartialMatch(normalizedPath, patterns, flags, depth))
                 continue;
 
-            foreach (var e in EnumerateEntriesRecursive(basePath, entry, patterns, excludes, depth + 1, target))
+            foreach (var e in EnumerateEntriesRecursive(basePath, entry, patterns, excludes, flags, depth + 1, target))
                 yield return e;
         }
     }
 
-    private static bool IsLeafMatch(string fullName, string[] patterns)
+    private static bool IsLeafMatch(string fullName, string[] patterns, MatchFlags flags)
     {
         foreach (var pattern in patterns)
-            if (Matcher.IsMatch(fullName, pattern))
+            if (Matcher.IsMatch(fullName, pattern, flags))
                 return true;
 
         return false;
     }
 
-    private static bool IsPartialMatch(string path, string[] patterns, int depth)
+    private static bool IsPartialMatch(string path, string[] patterns, MatchFlags flags, int depth)
     {
         foreach (var pattern in patterns)
-            if (Matcher.IsMatch(path, GetPartialPattern(pattern, depth)))
+            if (Matcher.IsMatch(path, GetPartialPattern(pattern, depth), flags))
                 return true;
 
         return false;
