@@ -51,19 +51,19 @@ public static unsafe class Matcher
     ///   </item>
     /// </list>
     /// </remarks>
-    /// <param name="pattern">The glob pattern to match against.</param>
     /// <param name="path">The path to test for a match.</param>
+    /// <param name="pattern">The glob pattern to match against.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// <c>true</c> if the pattern matches the path; otherwise, <c>false</c>.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsMatch(string pattern, string path, MatchFlags flags = MatchFlags.Auto)
+    public static bool IsMatch(string path, string pattern, MatchFlags flags = MatchFlags.Auto)
     {
-        _ = pattern.Length;
         _ = path.Length;
+        _ = pattern.Length;
 
-        return IsMatch(pattern.AsSpan(), path.AsSpan(), flags);
+        return IsMatch(path.AsSpan(), pattern.AsSpan(), flags);
     }
 
     /// <summary>
@@ -85,20 +85,20 @@ public static unsafe class Matcher
     ///   </item>
     /// </list>
     /// </remarks>
-    /// <param name="pattern">The glob pattern to match against.</param>
     /// <param name="path">The path to test for a match.</param>
+    /// <param name="pattern">The glob pattern to match against.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// <c>true</c> if the pattern matches the path; otherwise, <c>false</c>.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsMatch(ReadOnlySpan<char> pattern, ReadOnlySpan<char> path, MatchFlags flags = MatchFlags.Auto)
+    public static bool IsMatch(ReadOnlySpan<char> path, ReadOnlySpan<char> pattern, MatchFlags flags = MatchFlags.Auto)
     {
-        fixed (char* p = &MemoryMarshal.GetReference(pattern))
         fixed (char* v = &MemoryMarshal.GetReference(path))
+        fixed (char* p = &MemoryMarshal.GetReference(pattern))
         {
-            var pend = p + (uint)pattern.Length;
             var vend = v + (uint)path.Length;
+            var pend = p + (uint)pattern.Length;
 
             if (flags == MatchFlags.Windows || flags == MatchFlags.Auto && Path.DirectorySeparatorChar == '\\')
                 return DoMatch<Windows>(p, pend, v, vend) == vend;
