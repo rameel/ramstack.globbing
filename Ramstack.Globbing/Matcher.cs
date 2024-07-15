@@ -6,13 +6,54 @@ namespace Ramstack.Globbing;
 
 /// <summary>
 /// Provides functionality for shell-style glob matching using the glob pattern syntax.
-/// <para>Supported meta-characters include '*', '?', '\' and '[', ']'. And inside character classes '-', '!' and ']'.</para>
-/// <para>The '.' and '..' symbols do not have any special treatment and are processed as regular characters for matching.</para>
-/// <para>Character classes can be negated by prefixing them with '!', such as [!0-9], which matches all characters except digits.</para>
-/// <para>Brace patterns are supported, including nested brace pattern: {file,dir,name}, {file-1.{c,cpp},file-2.{cs,f}}</para>
-/// <para>An empty pattern in brace expansion {} is allowed, as well as variations like {.cs,}, {name,,file}, or {,.cs}.</para>
-/// <para>Leading and trailing separators are ignored, and consecutive delimiters are counted as one.</para>
 /// </summary>
+/// <remarks>
+/// <list type="bullet">
+///   <item>
+///     <description>
+///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
+///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+///     </description>
+///   </item>
+///   <item>
+///     <description>
+///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+///       as regular characters for matching.
+///     </description>
+///   </item>
+///   <item>
+///     <description>
+///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+///       which matches all characters except digits.
+///     </description>
+///   </item>
+///   <item>
+///     <description>
+///       Brace patterns are supported, including nested brace pattern:
+///       <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
+///     </description>
+///   </item>
+///   <item>
+///     <description>
+///       An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
+///       like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
+///     </description>
+///   </item>
+///   <item>
+///     <description>Leading and trailing separators are ignored.</description>
+///   </item>
+///   <item>
+///     <description>Consecutive separators are counted as one.</description>
+///   </item>
+///   <item>
+///     <description>
+///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+///       It can be used at the beginning, middle, or end of a pattern, for example,
+///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
+///     </description>
+///   </item>
+/// </list>
+/// </remarks>
 public static unsafe class Matcher
 {
     /// <summary>

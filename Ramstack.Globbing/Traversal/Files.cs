@@ -23,32 +23,32 @@ public static class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///         Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///         And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
+    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
-    ///         as regular characters for matching.
+    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
-    ///         which matches all characters except digits.
+    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Brace patterns are supported, including nested brace pattern:
-    ///         <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
+    ///       Brace patterns are supported, including nested brace pattern:
+    ///       <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
-    ///         like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
+    ///       An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
+    ///       like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
     ///     </description>
     ///   </item>
     ///   <item>
@@ -84,32 +84,32 @@ public static class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///         Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///         And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
+    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
-    ///         as regular characters for matching.
+    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
-    ///         which matches all characters except digits.
+    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Brace patterns are supported, including nested brace pattern:
-    ///         <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
+    ///       Brace patterns are supported, including nested brace pattern:
+    ///       <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
-    ///         like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
+    ///       An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
+    ///       like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
     ///     </description>
     ///   </item>
     ///   <item>
@@ -145,32 +145,32 @@ public static class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///         Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///         And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
+    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
-    ///         as regular characters for matching.
+    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
-    ///         which matches all characters except digits.
+    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Brace patterns are supported, including nested brace pattern:
-    ///         <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
+    ///       Brace patterns are supported, including nested brace pattern:
+    ///       <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
-    ///         like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
+    ///       An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
+    ///       like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
     ///     </description>
     ///   </item>
     ///   <item>
@@ -206,32 +206,32 @@ public static class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///         Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///         And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
+    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
-    ///         as regular characters for matching.
+    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
-    ///         which matches all characters except digits.
+    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Brace patterns are supported, including nested brace pattern:
-    ///         <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
+    ///       Brace patterns are supported, including nested brace pattern:
+    ///       <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
-    ///         like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
+    ///       An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
+    ///       like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
     ///     </description>
     ///   </item>
     ///   <item>
@@ -267,32 +267,32 @@ public static class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///         Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///         And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
+    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
-    ///         as regular characters for matching.
+    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
-    ///         which matches all characters except digits.
+    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Brace patterns are supported, including nested brace pattern:
-    ///         <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
+    ///       Brace patterns are supported, including nested brace pattern:
+    ///       <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
-    ///         like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
+    ///       An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
+    ///       like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
     ///     </description>
     ///   </item>
     ///   <item>
@@ -328,32 +328,32 @@ public static class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///         Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///         And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
+    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
-    ///         as regular characters for matching.
+    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
-    ///         which matches all characters except digits.
+    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         Brace patterns are supported, including nested brace pattern:
-    ///         <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
+    ///       Brace patterns are supported, including nested brace pattern:
+    ///       <c>{file,dir,name}</c>, <c>{file-1.{c,cpp},file-2.{cs,f}}</c>
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///         An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
-    ///         like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
+    ///       An empty pattern in brace expansion  <c>{}</c> is allowed, as well as variations
+    ///       like <c>{.cs,}</c>, <c>{name,,file}</c>, or  <c>{,.cs}</c>.
     ///     </description>
     ///   </item>
     ///   <item>
