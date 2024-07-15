@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Ramstack.Globbing.Traversal;
+namespace Ramstack.Globbing.Extensions;
 
 /// <summary>
 /// Provides methods for enumerating files and directories based on glob patterns and optional exclusions.
