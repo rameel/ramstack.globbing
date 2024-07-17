@@ -750,6 +750,8 @@ partial class Files
 
     private static IEnumerable<string> EnumerateEntries(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
+        flags = AdjustMatchFlags(flags);
+
         return new FileSystemEnumerable<string>(Path.GetFullPath(path), (ref FileSystemEntry entry) => entry.ToFullPath(), options)
         {
             ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, flags, target),

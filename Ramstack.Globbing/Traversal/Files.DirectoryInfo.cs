@@ -750,6 +750,8 @@ partial class Files
 
     private static IEnumerable<FileInfo> EnumerateFiles(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
+        flags = AdjustMatchFlags(flags);
+
         return new FileSystemEnumerable<FileInfo>(path, (ref FileSystemEntry entry) => (FileInfo)entry.ToFileSystemInfo(), options)
         {
             ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, flags, target),
@@ -758,6 +760,8 @@ partial class Files
     }
     private static IEnumerable<DirectoryInfo> EnumerateDirectories(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
+        flags = AdjustMatchFlags(flags);
+
         return new FileSystemEnumerable<DirectoryInfo>(path, (ref FileSystemEntry entry) => (DirectoryInfo)entry.ToFileSystemInfo(), options)
         {
             ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, flags, target),
@@ -766,6 +770,8 @@ partial class Files
     }
     private static IEnumerable<FileSystemInfo> EnumerateInfos(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
+        flags = AdjustMatchFlags(flags);
+
         return new FileSystemEnumerable<FileSystemInfo>(path, (ref FileSystemEntry entry) => entry.ToFileSystemInfo(), options)
         {
             ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, flags, target),
