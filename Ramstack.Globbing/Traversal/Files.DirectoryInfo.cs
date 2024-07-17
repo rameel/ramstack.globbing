@@ -7,13 +7,13 @@ partial class Files
     /// <summary>
     /// Enumerates files in a directory that match the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of files.</param>
     /// <param name="exclude">Optional glob pattern to exclude files.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// An enumerable collection of files in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -69,13 +69,13 @@ partial class Files
     /// <summary>
     /// Enumerates files in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of files.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude files.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// An enumerable collection of files in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -131,13 +131,13 @@ partial class Files
     /// <summary>
     /// Enumerates files in a directory that match the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of files.</param>
     /// <param name="exclude">The glob pattern to exclude files.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// An enumerable collection of files in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -193,13 +193,13 @@ partial class Files
     /// <summary>
     /// Enumerates files in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of files.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude files.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// An enumerable collection of files in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -255,13 +255,13 @@ partial class Files
     /// <summary>
     /// Enumerates directories in a directory that match the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of directories.</param>
     /// <param name="exclude">Optional glob pattern to exclude directories.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// An enumerable collection of directories in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -317,13 +317,13 @@ partial class Files
     /// <summary>
     /// Enumerates directories in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of directories.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude directories.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// An enumerable collection of directories in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -379,13 +379,13 @@ partial class Files
     /// <summary>
     /// Enumerates directories in a directory that match the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of directories.</param>
     /// <param name="exclude">Optional glob pattern to exclude directories.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// An enumerable collection of directories in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -441,13 +441,13 @@ partial class Files
     /// <summary>
     /// Enumerates directories in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of directories.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude directories.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// An enumerable collection of directories in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -501,15 +501,15 @@ partial class Files
         (IEnumerable<DirectoryInfo>)EnumerateEntries<DirectoryInfo>(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Directories, options.ToEnumerationOptions());
 
     /// <summary>
-    /// Enumerates file-system entries (files and directories) in a directory that match the specified glob pattern.
+    /// Enumerates file system information objects in a directory that match any of the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of file-system entries in path.</param>
     /// <param name="exclude">Optional glob pattern to exclude file-system entries.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// An enumerable collection of file system information objects in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -563,15 +563,15 @@ partial class Files
         EnumerateEntries<FileSystemInfo>(directory.FullName, [pattern], ToExcludes(exclude), flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
-    /// Enumerates file-system entries (files and directories) in a directory that match any of the specified glob patterns.
+    /// Enumerates file system information objects in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of file-system entries.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude file-system entries.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// An enumerable collection of file system information objects in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -625,15 +625,15 @@ partial class Files
         EnumerateEntries<FileSystemInfo>(directory.FullName, patterns, excludes ?? [], flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
-    /// Enumerates file-system entries (files and directories) in a directory that match the specified glob pattern.
+    /// Enumerates file system information objects in a directory that match any of the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of file-system entries in path.</param>
     /// <param name="exclude">Optional glob pattern to exclude file-system entries.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// An enumerable collection of file system information objects in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -687,15 +687,15 @@ partial class Files
         EnumerateEntries<FileSystemInfo>(directory.FullName, [pattern], ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
 
     /// <summary>
-    /// Enumerates file-system entries (files and directories) in a directory that match any of the specified glob patterns.
+    /// Enumerates file system information objects in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of file-system entries.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude file-system entries.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// An enumerable collection of file system information objects in the directory specified by <paramref name="directory"/>
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:

@@ -13,7 +13,7 @@ partial class Files
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -75,7 +75,7 @@ partial class Files
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -137,7 +137,7 @@ partial class Files
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
     /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -199,7 +199,7 @@ partial class Files
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
     /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -261,7 +261,7 @@ partial class Files
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -323,7 +323,7 @@ partial class Files
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -385,7 +385,7 @@ partial class Files
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
     /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -447,7 +447,7 @@ partial class Files
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
     /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -509,7 +509,7 @@ partial class Files
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -571,7 +571,7 @@ partial class Files
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -633,7 +633,7 @@ partial class Files
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
     /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob pattern.
+    /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
@@ -695,7 +695,7 @@ partial class Files
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
     /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
-    /// and that match the specified glob patterns.
+    /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
     /// Glob pattern:
