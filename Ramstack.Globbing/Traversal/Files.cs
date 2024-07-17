@@ -110,7 +110,7 @@ public static partial class Files
                 separator = false;
                 depth--;
 
-                if (Unsafe.As<char, int>(ref Unsafe.Add(ref s, i)) == 0x2a002a)
+                if (Unsafe.As<char, int>(ref Unsafe.Add(ref s, i)) == ('*' << 16 | '*'))
                 {
                     if (Unsafe.Add(ref s, i + 2) == '/' || i + 2 >= pattern.Length)
                     {
