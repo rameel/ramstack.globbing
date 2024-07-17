@@ -21,7 +21,7 @@ public static partial class Files
                 skip));
     }
 
-    private static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, SearchTarget target, MatchFlags flags)
+    private static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target)
     {
         var current = entry.IsDirectory
             ? SearchTarget.Directories
@@ -110,7 +110,7 @@ public static partial class Files
                 separator = false;
                 depth--;
 
-                if (Unsafe.As<char, int>(ref Unsafe.Add(ref s, i)) == 0x2a002a)
+                if (Unsafe.As<char, int>(ref Unsafe.Add(ref s, i)) == ('*' << 16 | '*'))
                 {
                     if (Unsafe.Add(ref s, i + 2) == '/' || i + 2 >= pattern.Length)
                     {

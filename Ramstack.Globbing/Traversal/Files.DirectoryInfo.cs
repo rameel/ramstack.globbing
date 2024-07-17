@@ -64,7 +64,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directory, string pattern, string? exclude, MatchFlags flags = MatchFlags.Auto) =>
-        (IEnumerable<FileInfo>)EnumerateEntries<FileInfo>(directory.FullName, [pattern], ToExcludes(exclude), flags, SearchTarget.Files, TraversalOptions.DefaultEnumerationOptions);
+        EnumerateFiles(directory.FullName, [pattern], ToExcludes(exclude), flags, SearchTarget.Files, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
     /// Enumerates files in a directory that match any of the specified glob patterns.
@@ -126,7 +126,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directory, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
-        (IEnumerable<FileInfo>)EnumerateEntries<FileInfo>(directory.FullName, patterns, excludes ?? [], flags, SearchTarget.Files, TraversalOptions.DefaultEnumerationOptions);
+        EnumerateFiles(directory.FullName, patterns, excludes ?? [], flags, SearchTarget.Files, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
     /// Enumerates files in a directory that match the specified glob pattern.
@@ -188,7 +188,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directory, string pattern, string? exclude, TraversalOptions? options) =>
-        (IEnumerable<FileInfo>)EnumerateEntries<FileInfo>(directory.FullName, [pattern], ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Files, options.ToEnumerationOptions());
+        EnumerateFiles(directory.FullName, [pattern], ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Files, options.ToEnumerationOptions());
 
     /// <summary>
     /// Enumerates files in a directory that match any of the specified glob patterns.
@@ -250,7 +250,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directory, string[] patterns, string[]? excludes, TraversalOptions? options) =>
-        (IEnumerable<FileInfo>)EnumerateEntries<FileInfo>(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Files, options.ToEnumerationOptions());
+        EnumerateFiles(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Files, options.ToEnumerationOptions());
 
     /// <summary>
     /// Enumerates directories in a directory that match the specified glob pattern.
@@ -312,7 +312,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directory, string pattern, string? exclude, MatchFlags flags = MatchFlags.Auto) =>
-        (IEnumerable<DirectoryInfo>)EnumerateEntries<DirectoryInfo>(directory.FullName, [pattern], ToExcludes(exclude), flags, SearchTarget.Directories, TraversalOptions.DefaultEnumerationOptions);
+        EnumerateDirectories(directory.FullName, [pattern], ToExcludes(exclude), flags, SearchTarget.Directories, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
     /// Enumerates directories in a directory that match any of the specified glob patterns.
@@ -374,7 +374,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directory, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
-        (IEnumerable<DirectoryInfo>)EnumerateEntries<DirectoryInfo>(directory.FullName, patterns, excludes ?? [], flags, SearchTarget.Directories, TraversalOptions.DefaultEnumerationOptions);
+        EnumerateDirectories(directory.FullName, patterns, excludes ?? [], flags, SearchTarget.Directories, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
     /// Enumerates directories in a directory that match the specified glob pattern.
@@ -436,7 +436,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directory, string pattern, string? exclude, TraversalOptions? options) =>
-        (IEnumerable<DirectoryInfo>)EnumerateEntries<DirectoryInfo>(directory.FullName, [pattern], ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Directories, options.ToEnumerationOptions());
+        EnumerateDirectories(directory.FullName, [pattern], ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Directories, options.ToEnumerationOptions());
 
     /// <summary>
     /// Enumerates directories in a directory that match any of the specified glob patterns.
@@ -498,7 +498,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directory, string[] patterns, string[]? excludes, TraversalOptions? options) =>
-        (IEnumerable<DirectoryInfo>)EnumerateEntries<DirectoryInfo>(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Directories, options.ToEnumerationOptions());
+        EnumerateDirectories(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Directories, options.ToEnumerationOptions());
 
     /// <summary>
     /// Enumerates file system information objects in a directory that match any of the specified glob pattern.
@@ -560,7 +560,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string pattern, string? exclude, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries<FileSystemInfo>(directory.FullName, [pattern], ToExcludes(exclude), flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
+        EnumerateInfos(directory.FullName, [pattern], ToExcludes(exclude), flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
     /// Enumerates file system information objects in a directory that match any of the specified glob patterns.
@@ -622,7 +622,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries<FileSystemInfo>(directory.FullName, patterns, excludes ?? [], flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
+        EnumerateInfos(directory.FullName, patterns, excludes ?? [], flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
     /// Enumerates file system information objects in a directory that match any of the specified glob pattern.
@@ -684,7 +684,7 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string pattern, string? exclude, TraversalOptions? options) =>
-        EnumerateEntries<FileSystemInfo>(directory.FullName, [pattern], ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
+        EnumerateInfos(directory.FullName, [pattern], ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
 
     /// <summary>
     /// Enumerates file system information objects in a directory that match any of the specified glob patterns.
@@ -746,13 +746,29 @@ partial class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string[] patterns, string[]? excludes, TraversalOptions? options) =>
-        EnumerateEntries<FileSystemInfo>(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
+        EnumerateInfos(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
 
-    private static IEnumerable<FileSystemInfo> EnumerateEntries<T>(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options) where T : FileSystemInfo
+    private static IEnumerable<FileInfo> EnumerateFiles(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
-        return new FileSystemEnumerable<T>(path, (ref FileSystemEntry entry) => (T)entry.ToFileSystemInfo(), options)
+        return new FileSystemEnumerable<FileInfo>(path, (ref FileSystemEntry entry) => (FileInfo)entry.ToFileSystemInfo(), options)
         {
-            ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, target, flags),
+            ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, flags, target),
+            ShouldRecursePredicate = (ref FileSystemEntry entry) => ShouldRecurse(ref entry, patterns, excludes, flags)
+        };
+    }
+    private static IEnumerable<DirectoryInfo> EnumerateDirectories(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
+    {
+        return new FileSystemEnumerable<DirectoryInfo>(path, (ref FileSystemEntry entry) => (DirectoryInfo)entry.ToFileSystemInfo(), options)
+        {
+            ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, flags, target),
+            ShouldRecursePredicate = (ref FileSystemEntry entry) => ShouldRecurse(ref entry, patterns, excludes, flags)
+        };
+    }
+    private static IEnumerable<FileSystemInfo> EnumerateInfos(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
+    {
+        return new FileSystemEnumerable<FileSystemInfo>(path, (ref FileSystemEntry entry) => entry.ToFileSystemInfo(), options)
+        {
+            ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, flags, target),
             ShouldRecursePredicate = (ref FileSystemEntry entry) => ShouldRecurse(ref entry, patterns, excludes, flags)
         };
     }
