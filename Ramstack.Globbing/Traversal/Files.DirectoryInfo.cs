@@ -63,7 +63,7 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directory, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
+    public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directory, string pattern, string? exclude, MatchFlags flags = MatchFlags.Auto) =>
         (IEnumerable<FileInfo>)EnumerateEntries<FileInfo>(directory.FullName, [pattern], ToExcludes(exclude), flags, SearchTarget.Files, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
@@ -311,7 +311,7 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directory, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
+    public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directory, string pattern, string? exclude, MatchFlags flags = MatchFlags.Auto) =>
         (IEnumerable<DirectoryInfo>)EnumerateEntries<DirectoryInfo>(directory.FullName, [pattern], ToExcludes(exclude), flags, SearchTarget.Directories, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
@@ -559,7 +559,7 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
+    public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string pattern, string? exclude, MatchFlags flags = MatchFlags.Auto) =>
         EnumerateEntries<FileSystemInfo>(directory.FullName, [pattern], ToExcludes(exclude), flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
