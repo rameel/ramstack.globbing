@@ -21,7 +21,7 @@ public static partial class Files
                 skip));
     }
 
-    private static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, SearchTarget target, MatchFlags flags)
+    private static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target)
     {
         var current = entry.IsDirectory
             ? SearchTarget.Directories
