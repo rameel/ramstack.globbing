@@ -124,6 +124,16 @@ public static partial class Files
         return MemoryMarshal.CreateReadOnlySpan(ref s, (int)i);
     }
 
+    private static MatchFlags AdjustMatchFlags(MatchFlags flags)
+    {
+        if (flags == MatchFlags.Auto)
+            return Path.DirectorySeparatorChar == '\\'
+                ? MatchFlags.Windows
+                : MatchFlags.Unix;
+
+        return flags;
+    }
+
     private static string[] ToExcludes(string? exclude) =>
         exclude is not null ? [exclude] : [];
 
