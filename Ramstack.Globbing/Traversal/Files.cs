@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.IO.Enumeration;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Ramstack.Globbing.Traversal;
@@ -68,7 +69,7 @@ public static class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<string> EnumerateFiles(string path, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, SearchTarget.Files, depth: 0);
+        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, SearchTarget.Files, options: null);
 
     /// <summary>
     /// Enumerates files in a directory that match any of the specified glob patterns.
@@ -130,7 +131,7 @@ public static class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<string> EnumerateFiles(string path, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, patterns, excludes ?? [], flags, SearchTarget.Files, depth: 0);
+        EnumerateEntries(path, patterns, excludes ?? [], flags, SearchTarget.Files, options: null);
 
     /// <summary>
     /// Enumerates directories in a directory that match the specified glob pattern.
@@ -192,7 +193,7 @@ public static class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<string> EnumerateDirectories(string path, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, SearchTarget.Directories, depth: 0);
+        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, SearchTarget.Directories, options: null);
 
     /// <summary>
     /// Enumerates directories in a directory that match any of the specified glob patterns.
@@ -254,7 +255,7 @@ public static class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<string> EnumerateDirectories(string path, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, patterns, excludes ?? [], flags, SearchTarget.Directories, depth: 0);
+        EnumerateEntries(path, patterns, excludes ?? [], flags, SearchTarget.Directories, options: null);
 
     /// <summary>
     /// Returns an enumerable collection of file names and directory names that match a search pattern in a specified path.
@@ -316,7 +317,7 @@ public static class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<string> EnumerateFileSystemEntries(string path, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, SearchTarget.Both, depth: 0);
+        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, SearchTarget.Both, options: null);
 
     /// <summary>
     /// Enumerates file-system entries (files and directories) in a directory that match any of the specified glob patterns.
@@ -378,50 +379,49 @@ public static class Files
     /// </list>
     /// </remarks>
     public static IEnumerable<string> EnumerateFileSystemEntries(string path, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, patterns, excludes ?? [], flags, SearchTarget.Both, depth: 0);
+        EnumerateEntries(path, patterns, excludes ?? [], flags, SearchTarget.Both, options: null);
 
-    private static IEnumerable<string> EnumerateEntries(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, int depth)
+    private static IEnumerable<string> EnumerateEntries(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions? options)
     {
-        path = Path.GetFullPath(path);
-        return EnumerateEntriesRecursive(path, path, patterns, excludes, flags, target, depth);
-    }
-
-    private static IEnumerable<string> EnumerateEntriesRecursive(string basePath, string directory, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, int depth)
-    {
-        foreach (var entry in Directory.EnumerateFileSystemEntries(directory))
+        return new FileSystemEnumerable<string>(Path.GetFullPath(path), (ref FileSystemEntry entry) => entry.ToFullPath(), options)
         {
-            var current = Directory.Exists(entry)
-                ? SearchTarget.Directories
-                : SearchTarget.Files;
-
-            var normalizedPath = MemoryMarshal
-                .CreateReadOnlySpan(
-                    length: entry.Length - basePath.Length,
-                    reference: ref Unsafe.Add(
-                        ref Unsafe.AsRef(in entry.GetPinnableReference()),
-                        basePath.Length))
-                .ToString();
-
-            if ((target & current) != 0
-                && IsLeafMatch(normalizedPath, excludes, flags) == false
-                && IsLeafMatch(normalizedPath, patterns, flags))
-                yield return entry;
-
-            if (current != SearchTarget.Directories)
-                continue;
-
-            if (IsLeafMatch(normalizedPath, excludes, flags))
-                continue;
-
-            if (!IsPartialMatch(normalizedPath, patterns, flags, depth))
-                continue;
-
-            foreach (var e in EnumerateEntriesRecursive(basePath, entry, patterns, excludes, flags, target, depth + 1))
-                yield return e;
-        }
+            ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, target, flags),
+            ShouldRecursePredicate = (ref FileSystemEntry entry) => ShouldRecurse(ref entry, patterns, excludes, flags)
+        };
     }
 
-    private static bool IsLeafMatch(string fullName, string[] patterns, MatchFlags flags)
+    private static ReadOnlySpan<char> GetRelativePath(ref FileSystemEntry entry)
+    {
+        var path = entry.ToFullPath();
+        var skip = entry.RootDirectory.Length + 1;
+
+        return MemoryMarshal.CreateReadOnlySpan(
+            length: path.Length - skip,
+            reference: ref Unsafe.Add(
+                ref Unsafe.AsRef(in path.GetPinnableReference()),
+                skip));
+    }
+
+    private static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, SearchTarget target, MatchFlags flags)
+    {
+        var current = entry.IsDirectory
+            ? SearchTarget.Directories
+            : SearchTarget.Files;
+
+        var relative = GetRelativePath(ref entry);
+        return ((target & current) != 0
+            && IsLeafMatch(relative, excludes, flags) == false
+            && IsLeafMatch(relative, patterns, flags));
+    }
+
+    private static bool ShouldRecurse(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags)
+    {
+        var relative = GetRelativePath(ref entry);
+        return IsLeafMatch(relative, excludes, flags) == false
+            && IsPartialMatch(relative, patterns, flags);
+    }
+
+    private static bool IsLeafMatch(ReadOnlySpan<char> fullName, string[] patterns, MatchFlags flags)
     {
         foreach (var pattern in patterns)
             if (Matcher.IsMatch(fullName, pattern, flags))
@@ -430,13 +430,41 @@ public static class Files
         return false;
     }
 
-    private static bool IsPartialMatch(string path, string[] patterns, MatchFlags flags, int depth)
+    private static bool IsPartialMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
     {
+        var depth = CountPathSegments(path, flags) - 1;
         foreach (var pattern in patterns)
             if (Matcher.IsMatch(path, GetPartialPattern(pattern, depth), flags))
                 return true;
 
         return false;
+    }
+
+    private static int CountPathSegments(ReadOnlySpan<char> path, MatchFlags flags)
+    {
+        ref var s = ref Unsafe.AsRef(in path.GetPinnableReference());
+        ref var e = ref Unsafe.Add(ref s, (uint)path.Length);
+
+        while (Unsafe.IsAddressLessThan(ref s, ref e) && (s == '/' || (s == '\\' && flags == MatchFlags.Windows)))
+            s = ref Unsafe.Add(ref s, 1);
+
+        var count = 1;
+        var separator = false;
+
+        for (; Unsafe.IsAddressLessThan(ref s, ref e); s = ref Unsafe.Add(ref s, 1))
+        {
+            if (s == '/' || (s == '\\' && flags == MatchFlags.Windows))
+            {
+                separator = true;
+            }
+            else if (separator)
+            {
+                separator = false;
+                count++;
+            }
+        }
+
+        return count;
     }
 
     private static ReadOnlySpan<char> GetPartialPattern(string pattern, int depth)
