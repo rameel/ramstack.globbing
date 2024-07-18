@@ -28,14 +28,16 @@ public static partial class Files
             : SearchTarget.Files;
 
         var relative = GetRelativePath(ref entry);
-        return ((target & current) != 0
+
+        return (target & current) != 0
             && IsLeafMatch(relative, excludes, flags) == false
-            && IsLeafMatch(relative, patterns, flags));
+            && IsLeafMatch(relative, patterns, flags);
     }
 
     private static bool ShouldRecurse(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags)
     {
         var relative = GetRelativePath(ref entry);
+
         return IsLeafMatch(relative, excludes, flags) == false
             && IsPartialMatch(relative, patterns, flags);
     }
@@ -51,10 +53,10 @@ public static partial class Files
 
     private static bool IsPartialMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
     {
-        var depth = CountPathSegments(path, flags);
+        var count = CountPathSegments(path, flags);
 
         foreach (var pattern in patterns)
-            if (Matcher.IsMatch(path, GetPartialPattern(pattern, depth), flags))
+            if (Matcher.IsMatch(path, GetPartialPattern(pattern, flags, count), flags))
                 return true;
 
         return false;
@@ -87,12 +89,12 @@ public static partial class Files
         return count;
     }
 
-    private static ReadOnlySpan<char> GetPartialPattern(string pattern, int depth)
+    private static ReadOnlySpan<char> GetPartialPattern(string pattern, MatchFlags flags, int depth)
     {
         ref var s = ref Unsafe.AsRef(in pattern.GetPinnableReference());
         ref var e = ref Unsafe.Add(ref s, pattern.Length);
 
-        while (Unsafe.IsAddressLessThan(ref s, ref e) && s == '/')
+        while (Unsafe.IsAddressLessThan(ref s, ref e) && (s == '/' || (s == '\\' && flags == MatchFlags.Windows)))
             s = ref Unsafe.Add(ref s, 1);
 
         var separator = true;
@@ -100,7 +102,8 @@ public static partial class Files
 
         for (; i < pattern.Length; i++)
         {
-            if (Unsafe.Add(ref s, i) == '/')
+            var ch = Unsafe.Add(ref s, i);
+            if (ch == '/' || (ch == '\\' && flags == MatchFlags.Windows))
             {
                 separator = true;
                 if (depth == 0)
@@ -113,7 +116,8 @@ public static partial class Files
 
                 if (Unsafe.As<char, int>(ref Unsafe.Add(ref s, i)) == ('*' << 16 | '*'))
                 {
-                    if (Unsafe.Add(ref s, i + 2) == '/' || i + 2 >= pattern.Length)
+                    var c = Unsafe.Add(ref s, i + 2);
+                    if (c == '/' || (c == '\\' && flags == MatchFlags.Windows) || i + 2 >= pattern.Length)
                     {
                         i += 2;
                         break;
