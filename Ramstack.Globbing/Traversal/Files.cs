@@ -51,7 +51,8 @@ public static partial class Files
 
     private static bool IsPartialMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
     {
-        var depth = CountPathSegments(path, flags) - 1;
+        var depth = CountPathSegments(path, flags);
+
         foreach (var pattern in patterns)
             if (Matcher.IsMatch(path, GetPartialPattern(pattern, depth), flags))
                 return true;
@@ -94,7 +95,7 @@ public static partial class Files
         while (Unsafe.IsAddressLessThan(ref s, ref e) && s == '/')
             s = ref Unsafe.Add(ref s, 1);
 
-        var separator = false;
+        var separator = true;
         var i = (nint)0;
 
         for (; i < pattern.Length; i++)
