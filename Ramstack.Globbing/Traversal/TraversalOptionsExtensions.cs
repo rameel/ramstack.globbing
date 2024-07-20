@@ -14,7 +14,10 @@ internal static class TraversalOptionsExtensions
     /// </returns>
     public static EnumerationOptions ToEnumerationOptions(this TraversalOptions? options)
     {
-        if (options is null or { IgnoreInaccessible: true, AttributesToSkip: (FileAttributes.Hidden | FileAttributes.System), MaxRecursionDepth: int.MaxValue })
+        if (options is null or {
+            AttributesToSkip: TraversalOptions.DefaultAttributesToSkip,
+            MaxRecursionDepth: TraversalOptions.DefaultMaxRecursionDepth,
+            IgnoreInaccessible: true })
             return TraversalOptions.DefaultEnumerationOptions;
 
         return new EnumerationOptions

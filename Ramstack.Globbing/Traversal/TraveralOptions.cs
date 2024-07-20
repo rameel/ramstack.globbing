@@ -8,13 +8,13 @@ public sealed class TraversalOptions
     /// <summary>
     /// Gets or sets the match flags. The default is <see cref="MatchFlags.Auto"/>
     /// </summary>
-    public MatchFlags MatchFlags { get; set; }
+    public MatchFlags MatchFlags { get; set; } = MatchFlags.Auto;
 
     /// <summary>
     /// Gets or sets the attributes to skip.
-    /// The default is <c>FileAttributes.Hidden | FileAttributes.System</c>.
+    /// The default is <c>0 (None)</c>.
     /// </summary>
-    public FileAttributes AttributesToSkip { get; set; } = FileAttributes.Hidden | FileAttributes.System;
+    public FileAttributes AttributesToSkip { get; set; } = DefaultAttributesToSkip;
 
     /// <summary>
     /// Gets or sets a value that indicates the maximum directory depth to recurse while traversing.
@@ -23,7 +23,7 @@ public sealed class TraversalOptions
     /// <remarks>
     /// If <see cref="MaxRecursionDepth"/> is set to zero, the contents of the initial directory will be returned.
     /// </remarks>
-    public int MaxRecursionDepth { get; set; } = int.MaxValue;
+    public int MaxRecursionDepth { get; set; } = DefaultMaxRecursionDepth;
 
     /// <summary>
     /// Gets or sets a value that indicates whether to skip files or directories when access is denied
@@ -42,6 +42,18 @@ public sealed class TraversalOptions
     /// </summary>
     internal static readonly EnumerationOptions DefaultEnumerationOptions = new()
     {
+        IgnoreInaccessible = true,
+        AttributesToSkip = DefaultAttributesToSkip,
         RecurseSubdirectories = true
     };
+
+    /// <summary>
+    /// The default file attributes to skip while traversing.
+    /// </summary>
+    internal const FileAttributes DefaultAttributesToSkip = 0;
+
+    /// <summary>
+    /// The default value for the maximum directory depth to recurse while traversing.
+    /// </summary>
+    internal const int DefaultMaxRecursionDepth = int.MaxValue;
 }
