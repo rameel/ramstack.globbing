@@ -1,4 +1,5 @@
-﻿using System.IO.Enumeration;
+using System.Buffers;
+using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -9,37 +10,53 @@ namespace Ramstack.Globbing.Traversal;
 /// </summary>
 public static partial class Files
 {
-    private static ReadOnlySpan<char> GetRelativePath(ref FileSystemEntry entry)
-    {
-        var path = entry.ToFullPath();
-        var skip = entry.RootDirectory.Length;
-
-        return MemoryMarshal.CreateReadOnlySpan(
-            length: path.Length - skip,
-            reference: ref Unsafe.Add(
-                ref Unsafe.AsRef(in path.GetPinnableReference()),
-                skip));
-    }
+    private const int StackallocThreshold = 128;
 
     private static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target)
     {
+        char[]? rented = null;
+
         var current = entry.IsDirectory
             ? SearchTarget.Directories
             : SearchTarget.Files;
 
-        var relative = GetRelativePath(ref entry);
+        var length = entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
+        var relativePath = (uint)length <= StackallocThreshold
+            ? stackalloc char[StackallocThreshold]
+            : (rented = ArrayPool<char>.Shared.Rent(length));
 
-        return (target & current) != 0
-            && IsLeafMatch(relative, excludes, flags) == false
-            && IsLeafMatch(relative, patterns, flags);
+        relativePath = relativePath[..length];
+        WriteRelativePath(ref entry, relativePath);
+
+        var matched = (target & current) != 0
+            && IsLeafMatch(relativePath, excludes, flags) == false
+            && IsLeafMatch(relativePath, patterns, flags);
+
+        if (rented is not null)
+            ArrayPool<char>.Shared.Return(rented);
+
+        return matched;
     }
 
     private static bool ShouldRecurse(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags)
     {
-        var relative = GetRelativePath(ref entry);
+        char[]? rented = null;
 
-        return IsLeafMatch(relative, excludes, flags) == false
-            && IsPartialMatch(relative, patterns, flags);
+        var length = entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
+        var relativePath = (uint)length <= StackallocThreshold
+            ? stackalloc char[StackallocThreshold]
+            : (rented = ArrayPool<char>.Shared.Rent(length));
+
+        relativePath = relativePath[..length];
+        WriteRelativePath(ref entry, relativePath);
+
+        var matched = IsLeafMatch(relativePath, excludes, flags) == false
+            && IsPartialMatch(relativePath, patterns, flags);
+
+        if (rented is not null)
+            ArrayPool<char>.Shared.Return(rented);
+
+        return matched;
     }
 
     private static bool IsLeafMatch(ReadOnlySpan<char> fullName, string[] patterns, MatchFlags flags)
@@ -127,6 +144,17 @@ public static partial class Files
         }
 
         return MemoryMarshal.CreateReadOnlySpan(ref s, (int)i);
+    }
+
+    private static void WriteRelativePath(ref FileSystemEntry entry, scoped Span<char> buffer)
+    {
+        entry.Directory.Slice(entry.RootDirectory.Length).CopyTo(buffer);
+        buffer = buffer.Slice(entry.Directory.Length - entry.RootDirectory.Length);
+
+        buffer[0] = '/';
+
+        buffer = buffer.Slice(1);
+        entry.FileName.CopyTo(buffer);
     }
 
     private static MatchFlags AdjustMatchFlags(MatchFlags flags)
