@@ -16,11 +16,11 @@ public enum MatchFlags
     /// This flag provides behavior consistent with Windows-style paths.
     /// Both backslashes (<c>\</c>) and forward (<c>/</c>) slashes are considered as path separators in this mode.
     /// </summary>
-    Windows,
+    Windows = 2 | 0x800,
 
     /// <summary>
     /// Treats backslashes <c>\</c> as escape sequences, allowing for special character escaping.
     /// This flag provides behavior consistent with Unix-style paths.
     /// </summary>
-    Unix
+    Unix = 4 | 0x800
 }
