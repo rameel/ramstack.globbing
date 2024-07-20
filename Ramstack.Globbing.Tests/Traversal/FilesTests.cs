@@ -113,4 +113,17 @@ public class FilesTests
 
         Assert.That(list, Is.EquivalentTo(expected));
     }
+
+    [TestCase(@"**/{hidden{,-folder}}/**/*.{tmp,dat}")]
+    [TestCase(@"**\{hidden{,-folder}}\**\*.{tmp,dat}")]
+    public void EnumerateFiles_NoEscaping(string pattern)
+    {
+        var list = Files.EnumerateFiles(_storage.Root, pattern, flags: MatchFlags.Windows).OrderBy(p => p);
+        var expected = Directory
+            .EnumerateFiles(_storage.Root, "*", SearchOption.AllDirectories)
+            .Where(p => Regex.IsMatch(p, @"\b(hidden|hidden-folder)\b"))
+            .OrderBy(p => p);
+
+        Assert.That(list, Is.EquivalentTo(expected));
+    }
 }
