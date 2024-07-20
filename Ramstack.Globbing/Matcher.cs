@@ -132,19 +132,28 @@ public static unsafe class Matcher
     /// <returns>
     /// <c>true</c> if the pattern matches the path; otherwise, <c>false</c>.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsMatch(ReadOnlySpan<char> path, ReadOnlySpan<char> pattern, MatchFlags flags = MatchFlags.Auto)
     {
-        fixed (char* v = &MemoryMarshal.GetReference(path))
-        fixed (char* p = &MemoryMarshal.GetReference(pattern))
+        return IsMatchImpl(
+            ref MemoryMarshal.GetReference(path),
+            path.Length,
+            ref MemoryMarshal.GetReference(pattern),
+            pattern.Length,
+            flags);
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static bool IsMatchImpl(ref char rv, int vlen, ref char rp, int plen, MatchFlags flags)
         {
-            var vend = v + (uint)path.Length;
-            var pend = p + (uint)pattern.Length;
+            fixed (char* v = &rv, p = &rp)
+            {
+                var vend = v + (uint)vlen;
+                var pend = p + (uint)plen;
 
-            if (flags == MatchFlags.Windows || flags == MatchFlags.Auto && Path.DirectorySeparatorChar == '\\')
-                return DoMatch<Windows>(p, pend, v, vend) == vend;
+                if (flags == MatchFlags.Windows || flags == MatchFlags.Auto && Path.DirectorySeparatorChar == '\\')
+                    return DoMatch<Windows>(p, pend, v, vend) == vend;
 
-            return DoMatch<Unix>(p, pend, v, vend) == vend;
+                return DoMatch<Unix>(p, pend, v, vend) == vend;
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -186,6 +195,7 @@ public static unsafe class Matcher
             return pend;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         static char* DoMatch<TFlags>(char* p, char* pend, char* v, char* vend)
         {
             var level = 0;
