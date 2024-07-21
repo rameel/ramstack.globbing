@@ -1,6 +1,10 @@
-﻿using System.IO.Enumeration;
+using System.Buffers;
+using System.Diagnostics;
+using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
+using Ramstack.Globbing.Utilities;
 
 namespace Ramstack.Globbing.Traversal;
 
@@ -9,35 +13,55 @@ namespace Ramstack.Globbing.Traversal;
 /// </summary>
 public static partial class Files
 {
-    private static ReadOnlySpan<char> GetRelativePath(ref FileSystemEntry entry)
-    {
-        var path = entry.ToFullPath();
-        var skip = entry.RootDirectory.Length;
-
-        return MemoryMarshal.CreateReadOnlySpan(
-            length: path.Length - skip,
-            reference: ref Unsafe.Add(
-                ref Unsafe.AsRef(in path.GetPinnableReference()),
-                skip));
-    }
+    private const int StackallocThreshold = 128;
 
     private static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target)
     {
+        char[]? rented = null;
+
         var current = entry.IsDirectory
             ? SearchTarget.Directories
             : SearchTarget.Files;
 
-        var relative = GetRelativePath(ref entry);
-        return ((target & current) != 0
-            && IsLeafMatch(relative, excludes, flags) == false
-            && IsLeafMatch(relative, patterns, flags));
+        var length = ComputeRelativePathLength(ref entry);
+        var relativePath = (uint)length <= StackallocThreshold
+            ? stackalloc char[StackallocThreshold]
+            : (rented = ArrayPool<char>.Shared.Rent(length));
+
+        relativePath = relativePath[..length];
+        WriteRelativePath(ref entry, relativePath);
+        UpdatePathSeparators(relativePath, flags);
+
+        var matched = (target & current) != 0
+            && IsLeafMatch(relativePath, excludes, flags) == false
+            && IsLeafMatch(relativePath, patterns, flags);
+
+        if (rented is not null)
+            ArrayPool<char>.Shared.Return(rented);
+
+        return matched;
     }
 
     private static bool ShouldRecurse(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags)
     {
-        var relative = GetRelativePath(ref entry);
-        return IsLeafMatch(relative, excludes, flags) == false
-            && IsPartialMatch(relative, patterns, flags);
+        char[]? rented = null;
+
+        var length = ComputeRelativePathLength(ref entry);
+        var relativePath = (uint)length <= StackallocThreshold
+            ? stackalloc char[StackallocThreshold]
+            : (rented = ArrayPool<char>.Shared.Rent(length));
+
+        relativePath = relativePath[..length];
+        WriteRelativePath(ref entry, relativePath);
+        UpdatePathSeparators(relativePath, flags);
+
+        var matched = IsLeafMatch(relativePath, excludes, flags) == false
+            && IsPartialMatch(relativePath, patterns, flags);
+
+        if (rented is not null)
+            ArrayPool<char>.Shared.Return(rented);
+
+        return matched;
     }
 
     private static bool IsLeafMatch(ReadOnlySpan<char> fullName, string[] patterns, MatchFlags flags)
@@ -51,9 +75,10 @@ public static partial class Files
 
     private static bool IsPartialMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
     {
-        var depth = CountPathSegments(path, flags) - 1;
+        var count = CountPathSegments(path, flags);
+
         foreach (var pattern in patterns)
-            if (Matcher.IsMatch(path, GetPartialPattern(pattern, depth), flags))
+            if (Matcher.IsMatch(path, GetPartialPattern(pattern, flags, count), flags))
                 return true;
 
         return false;
@@ -86,20 +111,21 @@ public static partial class Files
         return count;
     }
 
-    private static ReadOnlySpan<char> GetPartialPattern(string pattern, int depth)
+    private static ReadOnlySpan<char> GetPartialPattern(string pattern, MatchFlags flags, int depth)
     {
         ref var s = ref Unsafe.AsRef(in pattern.GetPinnableReference());
         ref var e = ref Unsafe.Add(ref s, pattern.Length);
 
-        while (Unsafe.IsAddressLessThan(ref s, ref e) && s == '/')
+        while (Unsafe.IsAddressLessThan(ref s, ref e) && (s == '/' || (s == '\\' && flags == MatchFlags.Windows)))
             s = ref Unsafe.Add(ref s, 1);
 
-        var separator = false;
+        var separator = true;
         var i = (nint)0;
 
         for (; i < pattern.Length; i++)
         {
-            if (Unsafe.Add(ref s, i) == '/')
+            var ch = Unsafe.Add(ref s, i);
+            if (ch == '/' || (ch == '\\' && flags == MatchFlags.Windows))
             {
                 separator = true;
                 if (depth == 0)
@@ -112,7 +138,8 @@ public static partial class Files
 
                 if (Unsafe.As<char, int>(ref Unsafe.Add(ref s, i)) == ('*' << 16 | '*'))
                 {
-                    if (Unsafe.Add(ref s, i + 2) == '/' || i + 2 >= pattern.Length)
+                    var c = Unsafe.Add(ref s, i + 2);
+                    if (c == '/' || (c == '\\' && flags == MatchFlags.Windows) || i + 2 >= pattern.Length)
                     {
                         i += 2;
                         break;
@@ -122,6 +149,36 @@ public static partial class Files
         }
 
         return MemoryMarshal.CreateReadOnlySpan(ref s, (int)i);
+    }
+
+    private static void WriteRelativePath(ref FileSystemEntry entry, scoped Span<char> buffer)
+    {
+        var directoryLength = entry.Directory.Length;
+        var rootLength = entry.RootDirectory.Length;
+        var relativeLength = directoryLength - rootLength;
+
+        entry.Directory.Slice(rootLength).CopyTo(buffer);
+        buffer[relativeLength ] = '/';
+
+        buffer = buffer.Slice(relativeLength  + 1);
+
+        Debug.Assert(buffer.Length == entry.FileName.Length);
+        entry.FileName.CopyTo(buffer);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int ComputeRelativePathLength(ref FileSystemEntry entry) =>
+        entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void UpdatePathSeparators(scoped Span<char> path, MatchFlags flags)
+    {
+        // To enable escaping in Windows systems, we convert backslashes (\) to forward slashes (/).
+        // This is safe because in Windows, backslashes are only used as path separators.
+        // Otherwise, the backslash (\) in the path will be treated as an escape character,
+        // and as a result, the `Unix` flag will essentially not work on a Windows system.
+        if (Path.DirectorySeparatorChar == '\\' && flags == MatchFlags.Unix)
+            PathHelper.ConvertToForwardSlashes(path);
     }
 
     private static MatchFlags AdjustMatchFlags(MatchFlags flags)

@@ -3,6 +3,9 @@
 Fast and zero-allocation .NET globbing library for matching file paths using [glob patterns](https://en.wikipedia.org/wiki/Glob_(programming)).
 No external dependencies.
 
+[![.NET](https://github.com/rameel/ramstack.globbing/actions/workflows/test.yml/badge.svg)](https://github.com/rameel/ramstack.globbing/actions/workflows/test.yml)
+
+
 ## Getting Started
 
 To install the `Ramstack.Globbing` [NuGet package](https://www.nuget.org/packages/Ramstack.Globbing) to your project, run the following command:
