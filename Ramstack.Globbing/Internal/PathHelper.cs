@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
 
 namespace Ramstack.Globbing.Internal;
@@ -35,49 +36,44 @@ internal static class PathHelper
             while (i < tail)
             {
                 value = LoadVector(ref p, i);
-                mask = Sse2.CompareEqual(value, backslash);
-                result = Sse41.BlendVariable(value, slash, mask);
+                mask = CompareEqual(value, backslash);
+                result = ConditionalSelect(value, slash, mask);
                 WriteVector(ref p, i, result);
 
                 i += Vector128<ushort>.Count;
             }
 
             value = LoadVector(ref p, tail);
-            mask = Sse2.CompareEqual(value, backslash);
-            result = Sse41.BlendVariable(value, slash, mask);
+            mask = CompareEqual(value, backslash);
+            result = ConditionalSelect(value, slash, mask);
             WriteVector(ref p, tail, result);
         }
-        //else if (AdvSimd.IsSupported && length >= Vector128<ushort>.Count)
-        //{
-        //    var slash = Vector128.Create((ushort)'/');
-        //    var backslash = Vector128.Create((ushort)'\\');
-        //    var tail = length - Vector128<ushort>.Count;
-
-        //    Vector128<ushort> value;
-        //    Vector128<ushort> mask;
-        //    Vector128<ushort> result;
-
-        //    while (i < tail)
-        //    {
-        //        value = LoadVector(ref p, i);
-        //        mask = AdvSimd.CompareEqual(value, backslash);
-        //        result = AdvSimd.BitwiseSelect(mask, slash, value);
-        //        WriteVector(ref p, i, result);
-
-        //        i += Vector128<ushort>.Count;
-        //    }
-
-        //    value = LoadVector(ref p, tail);
-        //    mask = AdvSimd.CompareEqual(value, backslash);
-        //    result = AdvSimd.BitwiseSelect(mask, slash, value);
-        //    WriteVector(ref p, tail, result);
-        //}
         else
         {
             for (; i < length; i++)
                 if (Unsafe.Add(ref p, i) == '\\')
                     Unsafe.Add(ref p, i) = '/';
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Vector128<ushort> CompareEqual(Vector128<ushort> left, Vector128<ushort> right)
+    {
+        if (Sse41.IsSupported)
+            return Sse2.CompareEqual(left, right);
+
+        // TODO Test
+        return AdvSimd.CompareEqual(left, right);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Vector128<ushort> ConditionalSelect(Vector128<ushort> left, Vector128<ushort> right, Vector128<ushort> mask)
+    {
+        if (Sse41.IsSupported)
+            return Sse41.BlendVariable(left, right, mask);;
+
+        // TODO Test
+        return AdvSimd.BitwiseSelect(mask, left, right);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
