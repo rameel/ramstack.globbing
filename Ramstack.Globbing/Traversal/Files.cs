@@ -4,7 +4,7 @@ using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-using Ramstack.Globbing.Internal;
+using Ramstack.Globbing.Utilities;
 
 namespace Ramstack.Globbing.Traversal;
 

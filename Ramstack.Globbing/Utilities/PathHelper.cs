@@ -5,7 +5,7 @@ using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
 
-namespace Ramstack.Globbing.Internal;
+namespace Ramstack.Globbing.Utilities;
 
 internal static class PathHelper
 {
