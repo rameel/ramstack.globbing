@@ -39,7 +39,7 @@ public class TempFileStorage : IDisposable
 
             "project/data/raw/dataset1.csv",
             "project/data/raw/dataset2.csv",
-            "project/data/raw/large_file.parquet",
+            "project/data/raw/dataset-[data]-{1}.csv",
             "project/data/processed/cleaned_data.csv",
             "project/data/processed/aggregated_results.json",
 

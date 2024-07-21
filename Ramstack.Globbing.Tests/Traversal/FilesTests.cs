@@ -116,6 +116,8 @@ public class FilesTests
 
     [TestCase(@"**/{hidden{,-folder}}/**/*.{tmp,dat}")]
     [TestCase(@"**\{hidden{,-folder}}\**\*.{tmp,dat}")]
+    [TestCase(@"project/**/{hidden{,-folder}}/**/*.{tmp,dat}")]
+    [TestCase(@"project\**\{hidden{,-folder}}\**\*.{tmp,dat}")]
     public void EnumerateFiles_NoEscaping(string pattern)
     {
         var list = Files.EnumerateFiles(_storage.Root, pattern, flags: MatchFlags.Windows).OrderBy(p => p);
@@ -124,6 +126,25 @@ public class FilesTests
             .Where(p => Regex.IsMatch(p, @"\b(hidden|hidden-folder)\b"))
             .OrderBy(p => p);
 
+        Assert.That(list, Is.EquivalentTo(expected));
+    }
+
+    [TestCase(@"project/**/dataset-\[data]-\{1}.csv")]
+    [TestCase(@"project/**/dataset-\[data\]-\{1\}.csv")]
+    [TestCase(@"project/**/dataset-\[*]-\{[0-9]}.csv")]
+    [TestCase(@"project/**/dataset-*.csv")]
+    public void EnumerateFiles_Escaping(string pattern)
+    {
+        var list = Files
+            .EnumerateFiles(_storage.Root, pattern, flags: MatchFlags.Unix)
+            .OrderBy(p => p)
+            .ToList();
+
+        var expected = Directory
+            .EnumerateFiles(Path.Combine(_storage.Root, "project", "data", "raw"), "dataset-*", SearchOption.AllDirectories)
+            .OrderBy(p => p);
+
+        Assert.That(list.Count, Is.EqualTo(1));
         Assert.That(list, Is.EquivalentTo(expected));
     }
 }

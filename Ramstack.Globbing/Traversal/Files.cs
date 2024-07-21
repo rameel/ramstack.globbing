@@ -1,7 +1,10 @@
 using System.Buffers;
+using System.Diagnostics;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
+using Ramstack.Globbing.Internal;
 
 namespace Ramstack.Globbing.Traversal;
 
@@ -20,13 +23,14 @@ public static partial class Files
             ? SearchTarget.Directories
             : SearchTarget.Files;
 
-        var length = entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
+        var length = ComputeRelativePathLength(ref entry);
         var relativePath = (uint)length <= StackallocThreshold
             ? stackalloc char[StackallocThreshold]
             : (rented = ArrayPool<char>.Shared.Rent(length));
 
         relativePath = relativePath[..length];
         WriteRelativePath(ref entry, relativePath);
+        UpdatePathSeparators(relativePath, flags);
 
         var matched = (target & current) != 0
             && IsLeafMatch(relativePath, excludes, flags) == false
@@ -42,13 +46,14 @@ public static partial class Files
     {
         char[]? rented = null;
 
-        var length = entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
+        var length = ComputeRelativePathLength(ref entry);
         var relativePath = (uint)length <= StackallocThreshold
             ? stackalloc char[StackallocThreshold]
             : (rented = ArrayPool<char>.Shared.Rent(length));
 
         relativePath = relativePath[..length];
         WriteRelativePath(ref entry, relativePath);
+        UpdatePathSeparators(relativePath, flags);
 
         var matched = IsLeafMatch(relativePath, excludes, flags) == false
             && IsPartialMatch(relativePath, patterns, flags);
@@ -148,13 +153,32 @@ public static partial class Files
 
     private static void WriteRelativePath(ref FileSystemEntry entry, scoped Span<char> buffer)
     {
-        entry.Directory.Slice(entry.RootDirectory.Length).CopyTo(buffer);
-        buffer = buffer.Slice(entry.Directory.Length - entry.RootDirectory.Length);
+        var directoryLength = entry.Directory.Length;
+        var rootLength = entry.RootDirectory.Length;
+        var relativeLength = directoryLength - rootLength;
 
-        buffer[0] = '/';
+        entry.Directory.Slice(rootLength).CopyTo(buffer);
+        buffer[relativeLength ] = '/';
 
-        buffer = buffer.Slice(1);
+        buffer = buffer.Slice(relativeLength  + 1);
+
+        Debug.Assert(buffer.Length == entry.FileName.Length);
         entry.FileName.CopyTo(buffer);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int ComputeRelativePathLength(ref FileSystemEntry entry) =>
+        entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void UpdatePathSeparators(scoped Span<char> path, MatchFlags flags)
+    {
+        // To enable escaping in Windows systems, we convert backslashes (\) to forward slashes (/).
+        // This is safe because in Windows, backslashes are only used as path separators.
+        // Otherwise, the backslash (\) in the path will be treated as an escape character,
+        // and as a result, the `Unix` flag will essentially not work on a Windows system.
+        if (Path.DirectorySeparatorChar == '\\' && flags == MatchFlags.Unix)
+            PathHelper.ToForwardSlashed(path);
     }
 
     private static MatchFlags AdjustMatchFlags(MatchFlags flags)
