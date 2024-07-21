@@ -4,7 +4,7 @@ namespace Ramstack.Globbing.Utilities;
 public class PathHelperTests
 {
     [Test]
-    public void ToForwardSlashed_NothingChange()
+    public void ConvertToForwardSlashes_NothingChange()
     {
         for (var n = 0; n < 512; n++)
         {
@@ -13,14 +13,14 @@ public class PathHelperTests
             span.Fill('a');
 
             var expected = original.ToString();
-            PathHelper.ToForwardSlashed(span);
+            PathHelper.ConvertToForwardSlashes(span);
 
             Assert.That(original.ToString(), Is.EqualTo(expected));
         }
     }
 
     [Test]
-    public void ToForwardSlashed_ChangesAll()
+    public void ConvertToForwardSlashes_ChangesAll()
     {
         for (var n = 0; n < 512; n++)
         {
@@ -29,14 +29,14 @@ public class PathHelperTests
             span.Fill('\\');
 
             var expected = original.ToString().Replace('\\', '/');
-            PathHelper.ToForwardSlashed(span);
+            PathHelper.ConvertToForwardSlashes(span);
 
             Assert.That(original.ToString(), Is.EqualTo(expected));
         }
     }
 
     [Test]
-    public void ToForwardSlashed_ForwardSlahes()
+    public void ConvertToForwardSlashes_ForwardSlahes()
     {
         for (var n = 0; n < 512; n++)
         {
@@ -45,14 +45,14 @@ public class PathHelperTests
             span.Fill('/');
 
             var expected = original.ToString().Replace('\\', '/');
-            PathHelper.ToForwardSlashed(span);
+            PathHelper.ConvertToForwardSlashes(span);
 
             Assert.That(original.ToString(), Is.EqualTo(expected));
         }
     }
 
     [Test]
-    public void ToForwardSlashed_RareChanges()
+    public void ConvertToForwardSlashes_RareChanges()
     {
         for (var n = 0; n < 512; n++)
         {
@@ -63,7 +63,7 @@ public class PathHelperTests
                     span[i] = '\\';
 
             var expected = original.ToString().Replace('\\', '/');
-            PathHelper.ToForwardSlashed(span);
+            PathHelper.ConvertToForwardSlashes(span);
 
             Assert.That(original.ToString(), Is.EqualTo(expected));
         }

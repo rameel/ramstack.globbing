@@ -178,7 +178,7 @@ public static partial class Files
         // Otherwise, the backslash (\) in the path will be treated as an escape character,
         // and as a result, the `Unix` flag will essentially not work on a Windows system.
         if (Path.DirectorySeparatorChar == '\\' && flags == MatchFlags.Unix)
-            PathHelper.ToForwardSlashed(path);
+            PathHelper.ConvertToForwardSlashes(path);
     }
 
     private static MatchFlags AdjustMatchFlags(MatchFlags flags)

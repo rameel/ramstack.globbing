@@ -7,9 +7,16 @@ using System.Runtime.Intrinsics.X86;
 
 namespace Ramstack.Globbing.Utilities;
 
+/// <summary>
+/// Provides helper methods for path manipulations.
+/// </summary>
 internal static class PathHelper
 {
-    public static void ToForwardSlashed(Span<char> value)
+    /// <summary>
+    /// Converts all backslashes in the specified span of characters to forward slashes.
+    /// </summary>
+    /// <param name="value">The span of characters to modify.</param>
+    public static void ConvertToForwardSlashes(scoped Span<char> value)
     {
         var length = (nint)(uint)value.Length;
         ref var reference = ref Unsafe.As<char, ushort>(
