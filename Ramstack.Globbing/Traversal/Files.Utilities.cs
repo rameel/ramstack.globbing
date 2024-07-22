@@ -88,11 +88,11 @@ partial class Files
     }
 
     /// <summary>
-    /// Resolves the match flags based on the current operating system's directory separator character.
+    /// Adjusts the provided match flags based on the current operating system's directory separator character.
     /// </summary>
     /// <param name="flags">The initial match flags to resolve.</param>
     /// <returns>
-    /// The resolved match flags. If the initial flags are <see cref="MatchFlags.Auto"/>, the method returns
+    /// The adjusted match flags. If the initial flags are <see cref="MatchFlags.Auto"/>, the method returns
     /// <see cref="MatchFlags.Windows"/> for Windows systems and <see cref="MatchFlags.Unix"/> for Unix-like systems;
     /// otherwise, it returns the provided flags.
     /// </returns>
