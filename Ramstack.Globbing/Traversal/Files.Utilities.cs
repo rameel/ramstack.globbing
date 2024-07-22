@@ -11,7 +11,7 @@ namespace Ramstack.Globbing.Traversal;
 partial class Files
 {
     /// <summary>
-    /// The threshold size in bytes for using stack allocation.
+    /// The threshold size in characters for using stack allocation.
     /// </summary>
     private const int StackallocThreshold = 260;
 
