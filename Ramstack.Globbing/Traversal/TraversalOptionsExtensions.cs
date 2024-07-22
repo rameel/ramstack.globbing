@@ -6,7 +6,7 @@
 internal static class TraversalOptionsExtensions
 {
     /// <summary>
-    /// Converts <paramref name="options"/> of type <see cref="TraversalOptions"/> to <see cref="EnumerationOptions"/>.
+    /// Converts traversal options to <see cref="EnumerationOptions"/>.
     /// </summary>
     /// <param name="options">The traversal options to convert.</param>
     /// <returns>
