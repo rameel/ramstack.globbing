@@ -2,17 +2,20 @@
 
 namespace Ramstack.Globbing.Traversal;
 
-partial class Files
+/// <summary>
+/// Provides extension methods for <see cref="DirectoryInfo"/> class.
+/// </summary>
+public static class DirectoryInfoExtensions
 {
     /// <summary>
     /// Enumerates files in a directory that match the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of files.</param>
     /// <param name="exclude">Optional glob pattern to exclude files.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of files in the directory specified by <paramref name="directory"/>
     /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
@@ -63,18 +66,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFiles(string path, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, SearchTarget.Files, TraversalOptions.DefaultEnumerationOptions);
+    public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directory, string pattern, string? exclude, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateFiles(directory.FullName, [pattern], Files.ToExcludes(exclude), flags, SearchTarget.Files, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
     /// Enumerates files in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of files.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude files.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of files in the directory specified by <paramref name="directory"/>
     /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
@@ -125,18 +128,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFiles(string path, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, patterns, excludes ?? [], flags, SearchTarget.Files, TraversalOptions.DefaultEnumerationOptions);
+    public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directory, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateFiles(directory.FullName, patterns, excludes ?? [], flags, SearchTarget.Files, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
     /// Enumerates files in a directory that match the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of files.</param>
     /// <param name="exclude">The glob pattern to exclude files.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of files in the directory specified by <paramref name="directory"/>
     /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
@@ -187,18 +190,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFiles(string path, string pattern, string? exclude, TraversalOptions? options) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Files, options.ToEnumerationOptions());
+    public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directory, string pattern, string? exclude, TraversalOptions? options) =>
+        EnumerateFiles(directory.FullName, [pattern], Files.ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Files, options.ToEnumerationOptions());
 
     /// <summary>
     /// Enumerates files in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of files.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude files.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the files in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of files in the directory specified by <paramref name="directory"/>
     /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
@@ -249,18 +252,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFiles(string path, string[] patterns, string[]? excludes, TraversalOptions? options) =>
-        EnumerateEntries(path, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Files, options.ToEnumerationOptions());
+    public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directory, string[] patterns, string[]? excludes, TraversalOptions? options) =>
+        EnumerateFiles(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Files, options.ToEnumerationOptions());
 
     /// <summary>
     /// Enumerates directories in a directory that match the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of directories.</param>
     /// <param name="exclude">Optional glob pattern to exclude directories.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of directories in the directory specified by <paramref name="directory"/>
     /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
@@ -311,18 +314,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateDirectories(string path, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, SearchTarget.Directories, TraversalOptions.DefaultEnumerationOptions);
+    public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directory, string pattern, string? exclude, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateDirectories(directory.FullName, [pattern], Files.ToExcludes(exclude), flags, SearchTarget.Directories, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
     /// Enumerates directories in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of directories.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude directories.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of directories in the directory specified by <paramref name="directory"/>
     /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
@@ -373,18 +376,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateDirectories(string path, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, patterns, excludes ?? [], flags, SearchTarget.Directories, TraversalOptions.DefaultEnumerationOptions);
+    public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directory, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateDirectories(directory.FullName, patterns, excludes ?? [], flags, SearchTarget.Directories, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
     /// Enumerates directories in a directory that match the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of directories.</param>
     /// <param name="exclude">Optional glob pattern to exclude directories.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of directories in the directory specified by <paramref name="directory"/>
     /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
@@ -435,18 +438,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateDirectories(string path, string pattern, string? exclude, TraversalOptions? options) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Directories, options.ToEnumerationOptions());
+    public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directory, string pattern, string? exclude, TraversalOptions? options) =>
+        EnumerateDirectories(directory.FullName, [pattern], Files.ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Directories, options.ToEnumerationOptions());
 
     /// <summary>
     /// Enumerates directories in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of directories.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude directories.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the directories in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of directories in the directory specified by <paramref name="directory"/>
     /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
@@ -497,18 +500,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateDirectories(string path, string[] patterns, string[]? excludes, TraversalOptions? options) =>
-        EnumerateEntries(path, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Directories, options.ToEnumerationOptions());
+    public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directory, string[] patterns, string[]? excludes, TraversalOptions? options) =>
+        EnumerateDirectories(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Directories, options.ToEnumerationOptions());
 
     /// <summary>
-    /// Enumerates file-system entries (files and directories) in a directory that match the specified glob pattern.
+    /// Enumerates file system information objects in a directory that match any of the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of file-system entries in path.</param>
     /// <param name="exclude">Optional glob pattern to exclude file-system entries.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of file system information objects in the directory specified by <paramref name="directory"/>
     /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
@@ -559,18 +562,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFileSystemEntries(string path, string pattern, string? exclude = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
+    public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string pattern, string? exclude, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateInfos(directory.FullName, [pattern], Files.ToExcludes(exclude), flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
-    /// Enumerates file-system entries (files and directories) in a directory that match any of the specified glob patterns.
+    /// Enumerates file system information objects in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of file-system entries.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude file-system entries.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of file system information objects in the directory specified by <paramref name="directory"/>
     /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
@@ -621,18 +624,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFileSystemEntries(string path, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
-        EnumerateEntries(path, patterns, excludes ?? [], flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
+    public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string[] patterns, string[]? excludes = null, MatchFlags flags = MatchFlags.Auto) =>
+        EnumerateInfos(directory.FullName, patterns, excludes ?? [], flags, SearchTarget.Both, TraversalOptions.DefaultEnumerationOptions);
 
     /// <summary>
-    /// Enumerates file-system entries (files and directories) in a directory that match the specified glob pattern.
+    /// Enumerates file system information objects in a directory that match any of the specified glob pattern.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="pattern">The glob pattern to match against the names of file-system entries in path.</param>
     /// <param name="exclude">Optional glob pattern to exclude file-system entries.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of file system information objects in the directory specified by <paramref name="directory"/>
     /// that match the specified glob pattern.
     /// </returns>
     /// <remarks>
@@ -683,18 +686,18 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFileSystemEntries(string path, string pattern, string? exclude, TraversalOptions? options) =>
-        EnumerateEntries(path, [pattern], ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
+    public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string pattern, string? exclude, TraversalOptions? options) =>
+        EnumerateInfos(directory.FullName, [pattern], Files.ToExcludes(exclude), options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
 
     /// <summary>
-    /// Enumerates file-system entries (files and directories) in a directory that match any of the specified glob patterns.
+    /// Enumerates file system information objects in a directory that match any of the specified glob patterns.
     /// </summary>
-    /// <param name="path">The relative or absolute path to the directory to search.</param>
+    /// <param name="directory">The <see cref="DirectoryInfo"/> instance representing the directory to search.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of file-system entries.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude file-system entries.</param>
     /// <param name="options">An object describing the traversal options.</param>
     /// <returns>
-    /// An enumerable collection of the full names for the file-system entries in the directory specified by <paramref name="path"/>
+    /// An enumerable collection of file system information objects in the directory specified by <paramref name="directory"/>
     /// that match the specified glob patterns.
     /// </returns>
     /// <remarks>
@@ -745,17 +748,37 @@ partial class Files
     ///   </item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<string> EnumerateFileSystemEntries(string path, string[] patterns, string[]? excludes, TraversalOptions? options) =>
-        EnumerateEntries(path, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
+    public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string[] patterns, string[]? excludes, TraversalOptions? options) =>
+        EnumerateInfos(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
 
-    private static IEnumerable<string> EnumerateEntries(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
+    private static IEnumerable<FileInfo> EnumerateFiles(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
-        flags = AdjustMatchFlags(flags);
+        flags = Files.AdjustMatchFlags(flags);
 
-        return new FileSystemEnumerable<string>(Path.GetFullPath(path), (ref FileSystemEntry entry) => entry.ToFullPath(), options)
+        return new FileSystemEnumerable<FileInfo>(path, (ref FileSystemEntry entry) => (FileInfo)entry.ToFileSystemInfo(), options)
         {
-            ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, flags, target),
-            ShouldRecursePredicate = (ref FileSystemEntry entry) => ShouldRecurse(ref entry, patterns, excludes, flags)
+            ShouldIncludePredicate = (ref FileSystemEntry entry) => Files.ShouldInclude(ref entry, patterns, excludes, flags, target),
+            ShouldRecursePredicate = (ref FileSystemEntry entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
+        };
+    }
+    private static IEnumerable<DirectoryInfo> EnumerateDirectories(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
+    {
+        flags = Files.AdjustMatchFlags(flags);
+
+        return new FileSystemEnumerable<DirectoryInfo>(path, (ref FileSystemEntry entry) => (DirectoryInfo)entry.ToFileSystemInfo(), options)
+        {
+            ShouldIncludePredicate = (ref FileSystemEntry entry) => Files.ShouldInclude(ref entry, patterns, excludes, flags, target),
+            ShouldRecursePredicate = (ref FileSystemEntry entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
+        };
+    }
+    private static IEnumerable<FileSystemInfo> EnumerateInfos(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
+    {
+        flags = Files.AdjustMatchFlags(flags);
+
+        return new FileSystemEnumerable<FileSystemInfo>(path, (ref FileSystemEntry entry) => entry.ToFileSystemInfo(), options)
+        {
+            ShouldIncludePredicate = (ref FileSystemEntry entry) => Files.ShouldInclude(ref entry, patterns, excludes, flags, target),
+            ShouldRecursePredicate = (ref FileSystemEntry entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
         };
     }
 }

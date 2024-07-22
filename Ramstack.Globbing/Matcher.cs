@@ -96,7 +96,7 @@ public static unsafe class Matcher
     /// <param name="pattern">The glob pattern to match against.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// <c>true</c> if the pattern matches the path; otherwise, <c>false</c>.
+    /// <see langword="true" /> if the pattern matches the path; otherwise, <see langword="false" />.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsMatch(string path, string pattern, MatchFlags flags = MatchFlags.Auto)
@@ -130,7 +130,7 @@ public static unsafe class Matcher
     /// <param name="pattern">The glob pattern to match against.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// <c>true</c> if the pattern matches the path; otherwise, <c>false</c>.
+    /// <see langword="true" /> if the pattern matches the path; otherwise, <see langword="false" />.
     /// </returns>
     public static bool IsMatch(ReadOnlySpan<char> path, ReadOnlySpan<char> pattern, MatchFlags flags = MatchFlags.Auto)
     {
@@ -450,6 +450,21 @@ public static unsafe class Matcher
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static char* MatchSubpattern(char* p, char* pend, char* v, char* vend)
     {
+        var last = (char*)0;
+
+        while (p < pend && p[0] != '}')
+        {
+            var e = ExtractSubpattern(p, pend);
+            var r = DoMatchSegment(p + 1, e, v, vend, subpattern: 1);
+
+            if (r > last)
+                last = r;
+
+            p = e;
+        }
+
+        return last;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static char* ExtractSubpattern(char* p, char* pend)
         {
@@ -475,21 +490,6 @@ public static unsafe class Matcher
 
             return p;
         }
-
-        var last = (char*)0;
-
-        while (p < pend && p[0] != '}')
-        {
-            var e = ExtractSubpattern(p, pend);
-            var r = DoMatchSegment(p + 1, e, v, vend, subpattern: 1);
-
-            if (r > last)
-                last = r;
-
-            p = e;
-        }
-
-        return last;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
