@@ -15,7 +15,7 @@ public static partial class Files
 {
     private const int StackallocThreshold = 128;
 
-    private static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target)
+    internal static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target)
     {
         char[]? rented = null;
 
@@ -42,7 +42,7 @@ public static partial class Files
         return matched;
     }
 
-    private static bool ShouldRecurse(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags)
+    internal static bool ShouldRecurse(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags)
     {
         char[]? rented = null;
 
@@ -63,6 +63,19 @@ public static partial class Files
 
         return matched;
     }
+
+    internal static MatchFlags AdjustMatchFlags(MatchFlags flags)
+    {
+        if (flags == MatchFlags.Auto)
+            return Path.DirectorySeparatorChar == '\\'
+                ? MatchFlags.Windows
+                : MatchFlags.Unix;
+
+        return flags;
+    }
+
+    internal static string[] ToExcludes(string? exclude) =>
+        exclude is not null ? [exclude] : [];
 
     private static bool IsLeafMatch(ReadOnlySpan<char> fullName, string[] patterns, MatchFlags flags)
     {
@@ -180,43 +193,4 @@ public static partial class Files
         if (Path.DirectorySeparatorChar == '\\' && flags == MatchFlags.Unix)
             PathHelper.ConvertToForwardSlashes(path);
     }
-
-    private static MatchFlags AdjustMatchFlags(MatchFlags flags)
-    {
-        if (flags == MatchFlags.Auto)
-            return Path.DirectorySeparatorChar == '\\'
-                ? MatchFlags.Windows
-                : MatchFlags.Unix;
-
-        return flags;
-    }
-
-    private static string[] ToExcludes(string? exclude) =>
-        exclude is not null ? [exclude] : [];
-
-    #region Inner type: SearchTarget
-
-    /// <summary>
-    /// Specifies the search targets for enumeration.
-    /// </summary>
-    [Flags]
-    private enum SearchTarget
-    {
-        /// <summary>
-        /// Search for files only.
-        /// </summary>
-        Files = 1,
-
-        /// <summary>
-        /// Search for directories only.
-        /// </summary>
-        Directories = 2,
-
-        /// <summary>
-        /// Search for both files and directories.
-        /// </summary>
-        Both = Files | Directories
-    }
-
-    #endregion
 }
