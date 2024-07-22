@@ -13,7 +13,7 @@ partial class Files
     /// <summary>
     /// The threshold size in bytes for using stack allocation.
     /// </summary>
-    private const int StackallocThreshold = 256;
+    private const int StackallocThreshold = 260;
 
     /// <summary>
     /// Determines whether the specified file system entry should be included in the results.
