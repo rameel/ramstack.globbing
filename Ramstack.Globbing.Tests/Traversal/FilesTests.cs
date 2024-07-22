@@ -38,6 +38,20 @@ public class FilesTests
     }
 
     [Test]
+    public void EnumerateEntries_Default_IncludesHidden()
+    {
+        var count = Files
+            .EnumerateFileSystemEntries(_storage.Root, "**")
+            .Count();
+
+        var expected = Directory
+            .EnumerateFileSystemEntries(_storage.Root, "*", SearchOption.AllDirectories)
+            .Count();
+
+        Assert.That(count, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void EnumerateFiles_OneLevel()
     {
         var list = Files
@@ -185,5 +199,58 @@ public class FilesTests
 
         Assert.That(list.Count, Is.EqualTo(1));
         Assert.That(list, Is.EquivalentTo(expected));
+    }
+
+    [Test]
+    public void EnumerateFiles_Uniqueness()
+    {
+        var list = Files.EnumerateFiles(_storage.Root, ["/project/**/faq.docx", "**/faq.*", "**/faq.docx"]);
+        Assert.That(list.Count(), Is.EqualTo(1));
+    }
+
+    [Test]
+    public void EnumerateFiles_Excludes()
+    {
+        var list = Files
+            .EnumerateFiles(_storage.Root,
+                patterns: ["**/assets/*.{png,jp*g}", "**/assets/styles/*.css", "**/assets/**"],
+                excludes: ["**/*.ttf"]);
+
+        Assert.That(list.Count(), Is.EqualTo(6));
+    }
+
+    [Test]
+    public void EnumerateFiles_ExcludeWins()
+    {
+        var list = Files
+            .EnumerateFiles(_storage.Root,
+                pattern: "**/assets/*.css",
+                exclude: "**/assets/*.css");
+
+        Assert.That(list.Count(), Is.EqualTo(0));
+    }
+
+    [Test]
+    public void EnumerateDirectories_Patterns()
+    {
+        var list = Files
+            .EnumerateDirectories(_storage.Root,
+                pattern: "**/assets/{images,fonts,styles}/**",
+                exclude: "**/assets/images");
+
+        // excluded: images, images/backgrounds
+        Assert.That(list.Count(), Is.EqualTo(2));
+    }
+
+    [Test]
+    public void EnumerateEntries_Patterns()
+    {
+        var list = Files
+            .EnumerateFileSystemEntries(_storage.Root,
+                pattern: "**/assets/{images,fonts,styles}/**",
+                exclude: "**/assets/images");
+
+        // excluded: images, images/backgrounds
+        Assert.That(list.Count(), Is.EqualTo(6));
     }
 }
