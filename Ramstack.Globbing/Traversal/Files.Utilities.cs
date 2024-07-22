@@ -10,8 +10,23 @@ namespace Ramstack.Globbing.Traversal;
 
 partial class Files
 {
-    private const int StackallocThreshold = 128;
+    /// <summary>
+    /// The threshold size in bytes for using stack allocation.
+    /// </summary>
+    private const int StackallocThreshold = 256;
 
+    /// <summary>
+    /// Determines whether the specified file system entry should be included in the results.
+    /// </summary>
+    /// <param name="entry">A file system entry reference.</param>
+    /// <param name="patterns">An array of glob patterns to match against the names of files.</param>
+    /// <param name="excludes">Optional array of glob patterns to exclude files.</param>
+    /// <param name="flags">The matching options to use.</param>
+    /// <param name="target">The search target.</param>
+    /// <returns>
+    /// <see langword="true" /> if the specified file system entry should be included in the results;
+    /// otherwise, <see langword="false" />.
+    /// </returns>
     internal static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target)
     {
         char[]? rented = null;
@@ -39,6 +54,17 @@ partial class Files
         return matched;
     }
 
+    /// <summary>
+    /// Determines whether the specified file system entry should be recursed.
+    /// </summary>
+    /// <param name="entry">A file system entry reference.</param>
+    /// <param name="patterns">An array of glob patterns to match against the names of files.</param>
+    /// <param name="excludes">Optional array of glob patterns to exclude files.</param>
+    /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
+    /// <returns>
+    /// <see langword="true" /> if the specified directory entry should be recursed into;
+    /// otherwise, <see langword="false" />.
+    /// </returns>
     internal static bool ShouldRecurse(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags)
     {
         char[]? rented = null;
@@ -61,6 +87,15 @@ partial class Files
         return matched;
     }
 
+    /// <summary>
+    /// Resolves the match flags based on the current operating system's directory separator character.
+    /// </summary>
+    /// <param name="flags">The initial match flags to resolve.</param>
+    /// <returns>
+    /// The resolved match flags. If the initial flags are <see cref="MatchFlags.Auto"/>, the method returns
+    /// <see cref="MatchFlags.Windows"/> for Windows systems and <see cref="MatchFlags.Unix"/> for Unix-like systems;
+    /// otherwise, it returns the provided flags.
+    /// </returns>
     internal static MatchFlags AdjustMatchFlags(MatchFlags flags)
     {
         if (flags == MatchFlags.Auto)
@@ -71,6 +106,13 @@ partial class Files
         return flags;
     }
 
+    /// <summary>
+    /// Converts a nullable exclude string to an array of exclude strings.
+    /// </summary>
+    /// <param name="exclude">The exclude string to convert.</param>
+    /// <returns>
+    /// An array of exclude strings.
+    /// </returns>
     internal static string[] ToExcludes(string? exclude) =>
         exclude is not null ? [exclude] : [];
 

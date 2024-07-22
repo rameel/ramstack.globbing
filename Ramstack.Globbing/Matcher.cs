@@ -96,7 +96,7 @@ public static unsafe class Matcher
     /// <param name="pattern">The glob pattern to match against.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// <c>true</c> if the pattern matches the path; otherwise, <c>false</c>.
+    /// <see langword="true" /> if the pattern matches the path; otherwise, <see langword="false" />.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsMatch(string path, string pattern, MatchFlags flags = MatchFlags.Auto)
@@ -130,7 +130,7 @@ public static unsafe class Matcher
     /// <param name="pattern">The glob pattern to match against.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
-    /// <c>true</c> if the pattern matches the path; otherwise, <c>false</c>.
+    /// <see langword="true" /> if the pattern matches the path; otherwise, <see langword="false" />.
     /// </returns>
     public static bool IsMatch(ReadOnlySpan<char> path, ReadOnlySpan<char> pattern, MatchFlags flags = MatchFlags.Auto)
     {

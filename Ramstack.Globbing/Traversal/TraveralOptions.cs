@@ -28,7 +28,7 @@ public sealed class TraversalOptions
     /// <summary>
     /// Gets or sets a value that indicates whether to skip files or directories when access is denied
     /// (for example, <see cref="UnauthorizedAccessException"/> or <see cref="System.Security.SecurityException"/>).
-    /// The default is <c>true</c>.
+    /// The default is <see langword="true" />.
     /// </summary>
     public bool IgnoreInaccessible { get; set; } = true;
 
