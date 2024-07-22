@@ -38,7 +38,7 @@ partial class Files
         var length = ComputeRelativePathLength(ref entry);
         var relativePath = (uint)length <= StackallocThreshold
             ? stackalloc char[StackallocThreshold]
-            : (rented = ArrayPool<char>.Shared.Rent(length));
+            : rented = ArrayPool<char>.Shared.Rent(length);
 
         relativePath = relativePath[..length];
         WriteRelativePath(ref entry, relativePath);
@@ -72,7 +72,7 @@ partial class Files
         var length = ComputeRelativePathLength(ref entry);
         var relativePath = (uint)length <= StackallocThreshold
             ? stackalloc char[StackallocThreshold]
-            : (rented = ArrayPool<char>.Shared.Rent(length));
+            : rented = ArrayPool<char>.Shared.Rent(length);
 
         relativePath = relativePath[..length];
         WriteRelativePath(ref entry, relativePath);

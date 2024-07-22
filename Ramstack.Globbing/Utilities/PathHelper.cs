@@ -77,7 +77,7 @@ internal static class PathHelper
     private static Vector128<ushort> ConditionalSelect(Vector128<ushort> left, Vector128<ushort> right, Vector128<ushort> mask)
     {
         if (Sse41.IsSupported)
-            return Sse41.BlendVariable(left, right, mask);;
+            return Sse41.BlendVariable(left, right, mask);
 
         // TODO Test
         return AdvSimd.BitwiseSelect(mask, left, right);

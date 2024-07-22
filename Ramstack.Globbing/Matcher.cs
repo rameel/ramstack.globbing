@@ -450,6 +450,21 @@ public static unsafe class Matcher
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static char* MatchSubpattern(char* p, char* pend, char* v, char* vend)
     {
+        var last = (char*)0;
+
+        while (p < pend && p[0] != '}')
+        {
+            var e = ExtractSubpattern(p, pend);
+            var r = DoMatchSegment(p + 1, e, v, vend, subpattern: 1);
+
+            if (r > last)
+                last = r;
+
+            p = e;
+        }
+
+        return last;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static char* ExtractSubpattern(char* p, char* pend)
         {
@@ -475,21 +490,6 @@ public static unsafe class Matcher
 
             return p;
         }
-
-        var last = (char*)0;
-
-        while (p < pend && p[0] != '}')
-        {
-            var e = ExtractSubpattern(p, pend);
-            var r = DoMatchSegment(p + 1, e, v, vend, subpattern: 1);
-
-            if (r > last)
-                last = r;
-
-            p = e;
-        }
-
-        return last;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
