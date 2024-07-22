@@ -2,7 +2,10 @@
 
 namespace Ramstack.Globbing.Traversal;
 
-partial class Files
+/// <summary>
+/// Provides methods for enumerating files and directories based on glob patterns and optional exclusions.
+/// </summary>
+public static partial class Files
 {
     /// <summary>
     /// Enumerates files in a directory that match the specified glob pattern.

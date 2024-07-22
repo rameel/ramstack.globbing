@@ -8,10 +8,7 @@ using Ramstack.Globbing.Utilities;
 
 namespace Ramstack.Globbing.Traversal;
 
-/// <summary>
-/// Provides methods for enumerating files and directories based on glob patterns and optional exclusions.
-/// </summary>
-public static partial class Files
+partial class Files
 {
     private const int StackallocThreshold = 128;
 
