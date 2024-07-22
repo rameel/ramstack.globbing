@@ -69,7 +69,7 @@ public class TempFileStorage : IDisposable
             "project/assets/images/logo.png",
             "project/assets/images/icon.svg",
             "project/assets/images/backgrounds/light.jpg",
-            "project/assets/images/backgrounds/dark.jpg",
+            "project/assets/images/backgrounds/dark.jpeg",
 
             "project/assets/fonts/opensans.ttf",
             "project/assets/fonts/roboto.ttf",
