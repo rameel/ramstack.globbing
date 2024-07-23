@@ -1,7 +1,6 @@
 namespace Ramstack.Globbing.Utilities;
 
-[TestFixture]
-public class PathHelperTests
+partial class PathHelperTests
 {
     [Test]
     public void ConvertToForwardSlashes_NothingChange()
