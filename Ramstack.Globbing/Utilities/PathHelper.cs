@@ -114,6 +114,17 @@ internal static class PathHelper
     {
         var i = (nint)0;
 
+        // The main reason for using our own implementation is that the method
+        // Replace(this Span<char> span, char oldValue, char newValue) is only available
+        // starting from .NET 8. Since we need to support earlier versions of .NET,
+        // we are using our own implementation.
+        //
+        // We are limiting ourselves to 128-bit vector registers in this implementation.
+        // Path lengths are typically small, so there is no significant benefit
+        // in using 256-bit or 512-bit vector instructions. In addition, including
+        // support for larger vector sizes would complicate the code without providing
+        // noticeable performance improvements.
+
         if (Sse41.IsSupported && length >= Vector128<ushort>.Count)
         {
             var slash = Vector128.Create((ushort)'/');
