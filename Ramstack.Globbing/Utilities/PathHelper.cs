@@ -40,14 +40,12 @@ internal static class PathHelper
             Vector128<ushort> mask;
             Vector128<ushort> result;
 
-            while (i < tail)
+            for (; i < tail; i += Vector128<ushort>.Count)
             {
                 value = LoadVector(ref p, i);
                 mask = CompareEqual(value, backslash);
                 result = ConditionalSelect(value, slash, mask);
                 WriteVector(ref p, i, result);
-
-                i += Vector128<ushort>.Count;
             }
 
             value = LoadVector(ref p, tail);

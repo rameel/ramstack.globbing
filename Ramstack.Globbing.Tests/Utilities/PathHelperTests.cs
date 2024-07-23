@@ -8,7 +8,7 @@ public class PathHelperTests
     {
         for (var n = 0; n < 512; n++)
         {
-            var original = new string('@', n + 16).ToCharArray().AsSpan();
+            var original = new string('\\', n + 16).ToCharArray().AsSpan();
             var span = original[8..^8];
             span.Fill('a');
 
@@ -28,10 +28,10 @@ public class PathHelperTests
             var span = original[8..^8];
             span.Fill('\\');
 
-            var expected = original.ToString().Replace('\\', '/');
+            var expected = original.ToString().Replace('\\', '/').Replace('@', '\\');
             PathHelper.ConvertToForwardSlashes(span);
 
-            Assert.That(original.ToString(), Is.EqualTo(expected));
+            Assert.That(original.ToString().Replace('@', '\\'), Is.EqualTo(expected));
         }
     }
 
@@ -44,10 +44,10 @@ public class PathHelperTests
             var span = original[8..^8];
             span.Fill('/');
 
-            var expected = original.ToString().Replace('\\', '/');
+            var expected = original.ToString().Replace('\\', '/').Replace('@', '\\');
             PathHelper.ConvertToForwardSlashes(span);
 
-            Assert.That(original.ToString(), Is.EqualTo(expected));
+            Assert.That(original.ToString().Replace('@', '\\'), Is.EqualTo(expected));
         }
     }
 
@@ -62,10 +62,10 @@ public class PathHelperTests
                 if (i % 7 == 0)
                     span[i] = '\\';
 
-            var expected = original.ToString().Replace('\\', '/');
+            var expected = original.ToString().Replace('\\', '/').Replace('@', '\\');
             PathHelper.ConvertToForwardSlashes(span);
 
-            Assert.That(original.ToString(), Is.EqualTo(expected));
+            Assert.That(original.ToString().Replace('@', '\\'), Is.EqualTo(expected));
         }
     }
 }

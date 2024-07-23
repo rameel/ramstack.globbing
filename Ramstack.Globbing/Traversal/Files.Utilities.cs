@@ -12,6 +12,7 @@ partial class Files
 {
     /// <summary>
     /// The threshold size in characters for using stack allocation.
+    /// This value corresponds to the <c>MAX_PATH</c> constant for paths in Windows.
     /// </summary>
     private const int StackallocThreshold = 260;
 
