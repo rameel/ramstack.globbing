@@ -61,9 +61,6 @@ internal static class PathHelper
         ref var s = ref Unsafe.AsRef(in pattern.GetPinnableReference());
         ref var e = ref Unsafe.Add(ref s, pattern.Length);
 
-        while (Unsafe.IsAddressLessThan(ref s, ref e) && (s == '/' || (s == '\\' && flags == MatchFlags.Windows)))
-            s = ref Unsafe.Add(ref s, 1);
-
         var separator = true;
         var i = (nint)0;
 
