@@ -13,6 +13,90 @@ namespace Ramstack.Globbing.Utilities;
 internal static class PathHelper
 {
     /// <summary>
+    /// Counts the number of segments in the given path.
+    /// </summary>
+    /// <param name="path">The path to count segments for.</param>
+    /// <param name="flags">The match flags that may influence the counting.</param>
+    /// <returns>
+    /// The number of segments in the path.
+    /// </returns>
+    public static int CountPathSegments(ReadOnlySpan<char> path, MatchFlags flags)
+    {
+        ref var s = ref Unsafe.AsRef(in path.GetPinnableReference());
+        ref var e = ref Unsafe.Add(ref s, (uint)path.Length);
+
+        while (Unsafe.IsAddressLessThan(ref s, ref e) && (s == '/' || (s == '\\' && flags == MatchFlags.Windows)))
+            s = ref Unsafe.Add(ref s, 1);
+
+        var count = 1;
+        var separator = false;
+
+        for (; Unsafe.IsAddressLessThan(ref s, ref e); s = ref Unsafe.Add(ref s, 1))
+        {
+            if (s == '/' || (s == '\\' && flags == MatchFlags.Windows))
+            {
+                separator = true;
+            }
+            else if (separator)
+            {
+                separator = false;
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    /// <summary>
+    /// Returns a partial pattern from the specified pattern string based on the specified depth.
+    /// </summary>
+    /// <param name="pattern">The pattern string to extract from.</param>
+    /// <param name="flags">The match flags that may influence the extraction.</param>
+    /// <param name="depth">The depth level to extract the partial pattern up to.</param>
+    /// <returns>
+    /// A <see cref="ReadOnlySpan{T}"/> representing the partial pattern.
+    /// </returns>
+    public static ReadOnlySpan<char> GetPartialPattern(string pattern, MatchFlags flags, int depth)
+    {
+        ref var s = ref Unsafe.AsRef(in pattern.GetPinnableReference());
+        ref var e = ref Unsafe.Add(ref s, pattern.Length);
+
+        while (Unsafe.IsAddressLessThan(ref s, ref e) && (s == '/' || (s == '\\' && flags == MatchFlags.Windows)))
+            s = ref Unsafe.Add(ref s, 1);
+
+        var separator = true;
+        var i = (nint)0;
+
+        for (; Unsafe.IsAddressLessThan(ref Unsafe.Add(ref s, i), ref e); i++)
+        {
+            var ch = Unsafe.Add(ref s, i);
+            if (ch == '/' || (ch == '\\' && flags == MatchFlags.Windows))
+            {
+                separator = true;
+                if (depth == 0)
+                    break;
+            }
+            else if (separator)
+            {
+                separator = false;
+                depth--;
+
+                if (Unsafe.As<char, int>(ref Unsafe.Add(ref s, i)) == ('*' << 16 | '*'))
+                {
+                    var c = Unsafe.Add(ref s, i + 2);
+                    if (c == '/' || (c == '\\' && flags == MatchFlags.Windows) || i + 2 >= pattern.Length)
+                    {
+                        i += 2;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return MemoryMarshal.CreateReadOnlySpan(ref s, (int)i);
+    }
+
+    /// <summary>
     /// Converts all backslashes in the specified span of characters to forward slashes.
     /// </summary>
     /// <param name="value">The span of characters to modify.</param>

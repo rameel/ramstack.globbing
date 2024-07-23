@@ -2,7 +2,6 @@ using System.Buffers;
 using System.Diagnostics;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 using Ramstack.Globbing.Utilities;
 
@@ -128,80 +127,13 @@ partial class Files
 
     private static bool IsPartialMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
     {
-        var count = CountPathSegments(path, flags);
+        var count = PathHelper.CountPathSegments(path, flags);
 
         foreach (var pattern in patterns)
-            if (Matcher.IsMatch(path, GetPartialPattern(pattern, flags, count), flags))
+            if (Matcher.IsMatch(path, PathHelper.GetPartialPattern(pattern, flags, count), flags))
                 return true;
 
         return false;
-    }
-
-    private static int CountPathSegments(ReadOnlySpan<char> path, MatchFlags flags)
-    {
-        ref var s = ref Unsafe.AsRef(in path.GetPinnableReference());
-        ref var e = ref Unsafe.Add(ref s, (uint)path.Length);
-
-        while (Unsafe.IsAddressLessThan(ref s, ref e) && (s == '/' || (s == '\\' && flags == MatchFlags.Windows)))
-            s = ref Unsafe.Add(ref s, 1);
-
-        var count = 1;
-        var separator = false;
-
-        for (; Unsafe.IsAddressLessThan(ref s, ref e); s = ref Unsafe.Add(ref s, 1))
-        {
-            if (s == '/' || (s == '\\' && flags == MatchFlags.Windows))
-            {
-                separator = true;
-            }
-            else if (separator)
-            {
-                separator = false;
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    private static ReadOnlySpan<char> GetPartialPattern(string pattern, MatchFlags flags, int depth)
-    {
-        ref var s = ref Unsafe.AsRef(in pattern.GetPinnableReference());
-        ref var e = ref Unsafe.Add(ref s, pattern.Length);
-
-        while (Unsafe.IsAddressLessThan(ref s, ref e) && (s == '/' || (s == '\\' && flags == MatchFlags.Windows)))
-            s = ref Unsafe.Add(ref s, 1);
-
-        var separator = true;
-        var i = (nint)0;
-
-        for (; i < pattern.Length; i++)
-        {
-            var ch = Unsafe.Add(ref s, i);
-            if (ch == '/' || (ch == '\\' && flags == MatchFlags.Windows))
-            {
-                separator = true;
-                if (depth == 0)
-                    break;
-            }
-            else if (separator)
-            {
-                separator = false;
-                depth--;
-
-                if (Unsafe.As<char, int>(ref Unsafe.Add(ref s, i)) == ('*' << 16 | '*'))
-                {
-                    var c = Unsafe.Add(ref s, i + 2);
-                    if (c == '/' || (c == '\\' && flags == MatchFlags.Windows) || i + 2 >= pattern.Length)
-                    {
-                        i += 2;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return MemoryMarshal.CreateReadOnlySpan(ref s, (int)i);
     }
 
     private static void WriteRelativePath(ref FileSystemEntry entry, scoped Span<char> buffer)
