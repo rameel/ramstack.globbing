@@ -35,7 +35,7 @@ partial class Files
             ? SearchTarget.Directories
             : SearchTarget.Files;
 
-        var length = ComputeRelativePathLength(ref entry);
+        var length = GetRelativePathLength(ref entry);
         var relativePath = (uint)length <= StackallocThreshold
             ? stackalloc char[StackallocThreshold]
             : rented = ArrayPool<char>.Shared.Rent(length);
@@ -69,7 +69,7 @@ partial class Files
     {
         char[]? rented = null;
 
-        var length = ComputeRelativePathLength(ref entry);
+        var length = GetRelativePathLength(ref entry);
         var relativePath = (uint)length <= StackallocThreshold
             ? stackalloc char[StackallocThreshold]
             : rented = ArrayPool<char>.Shared.Rent(length);
@@ -152,10 +152,16 @@ partial class Files
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int ComputeRelativePathLength(ref FileSystemEntry entry) =>
-        entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
+    private static int GetRelativePathLength(ref FileSystemEntry entry)
+    {
+        // AggressiveInlining
+        // ------------------
+        // This method is 47 bytes of IL code consisting solely of calls (6 calls),
+        // and JIT refuses to inline it, even though the x86-64 output results
+        // in a small set of instructions.
+        return entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
+    }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void UpdatePathSeparators(scoped Span<char> path, MatchFlags flags)
     {
         // To enable escaping in Windows systems, we convert backslashes (\) to forward slashes (/).
