@@ -106,11 +106,12 @@ internal static class PathHelper
         ref var reference = ref Unsafe.As<char, ushort>(
             ref MemoryMarshal.GetReference(value));
 
-        ReplaceImpl(ref reference, length);
+        ConvertToForwardSlashesImpl(ref reference, length);
     }
 
+    [SuppressMessage("Usage", "IDE0004:Remove Unnecessary Cast")]
     [SuppressMessage("ReSharper", "RedundantCast")]
-    private static void ReplaceImpl(ref ushort p, nint length)
+    private static void ConvertToForwardSlashesImpl(ref ushort p, nint length)
     {
         var i = (nint)0;
 
@@ -127,21 +128,37 @@ internal static class PathHelper
 
         if (Sse41.IsSupported && length >= Vector128<ushort>.Count)
         {
-            var slash = Vector128.Create((ushort)'/');
-            var backslash = Vector128.Create((ushort)'\\');
-            var tail = length - Vector128<ushort>.Count;
-
             Vector128<ushort> value;
             Vector128<ushort> mask;
             Vector128<ushort> result;
 
-            for (; i < tail; i += Vector128<ushort>.Count)
+            var slash = Vector128.Create((ushort)'/');
+            var backslash = Vector128.Create((ushort)'\\');
+            var tail = length - Vector128<ushort>.Count;
+
+            // +------+------+------+------+------+---+ DATA
+            //                                 +------+ TAIL
+            //
+            // After the main loop, only one final vector operation is needed
+            // for the 'tail' block.
+            //
+            //
+            // The pre-condition check in the `while (i < tail)` loop is only
+            // effective when `length == Vector<ushort>.Count`. For all other lengths,
+            // the condition will always be false, making the check unnecessary.
+            // If we move the check to the post-condition, we incur an extra one write,
+            // but only if `length == Vector<ushort>.Count`.
+
+            do
             {
                 value = LoadVector(ref p, i);
                 mask = CompareEqual(value, backslash);
                 result = ConditionalSelect(value, slash, mask);
                 WriteVector(ref p, i, result);
+
+                i += Vector128<ushort>.Count;
             }
+            while (i < tail);
 
             value = LoadVector(ref p, tail);
             mask = CompareEqual(value, backslash);
