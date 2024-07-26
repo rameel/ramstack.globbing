@@ -1,6 +1,6 @@
 ﻿namespace Ramstack.Globbing.Traversal.Helpers;
 
-public class TempFileStorage : IDisposable
+public sealed class TempFileStorage : IDisposable
 {
     public string Root { get; }
     public IReadOnlyList<string> FileList { get; }

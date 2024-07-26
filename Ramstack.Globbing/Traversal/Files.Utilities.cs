@@ -2,7 +2,6 @@ using System.Buffers;
 using System.Diagnostics;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 using Ramstack.Globbing.Utilities;
 
@@ -36,7 +35,7 @@ partial class Files
             ? SearchTarget.Directories
             : SearchTarget.Files;
 
-        var length = ComputeRelativePathLength(ref entry);
+        var length = GetRelativePathLength(ref entry);
         var relativePath = (uint)length <= StackallocThreshold
             ? stackalloc char[StackallocThreshold]
             : rented = ArrayPool<char>.Shared.Rent(length);
@@ -70,7 +69,7 @@ partial class Files
     {
         char[]? rented = null;
 
-        var length = ComputeRelativePathLength(ref entry);
+        var length = GetRelativePathLength(ref entry);
         var relativePath = (uint)length <= StackallocThreshold
             ? stackalloc char[StackallocThreshold]
             : rented = ArrayPool<char>.Shared.Rent(length);
@@ -128,80 +127,13 @@ partial class Files
 
     private static bool IsPartialMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
     {
-        var count = CountPathSegments(path, flags);
+        var count = PathHelper.CountPathSegments(path, flags);
 
         foreach (var pattern in patterns)
-            if (Matcher.IsMatch(path, GetPartialPattern(pattern, flags, count), flags))
+            if (Matcher.IsMatch(path, PathHelper.GetPartialPattern(pattern, flags, count), flags))
                 return true;
 
         return false;
-    }
-
-    private static int CountPathSegments(ReadOnlySpan<char> path, MatchFlags flags)
-    {
-        ref var s = ref Unsafe.AsRef(in path.GetPinnableReference());
-        ref var e = ref Unsafe.Add(ref s, (uint)path.Length);
-
-        while (Unsafe.IsAddressLessThan(ref s, ref e) && (s == '/' || (s == '\\' && flags == MatchFlags.Windows)))
-            s = ref Unsafe.Add(ref s, 1);
-
-        var count = 1;
-        var separator = false;
-
-        for (; Unsafe.IsAddressLessThan(ref s, ref e); s = ref Unsafe.Add(ref s, 1))
-        {
-            if (s == '/' || (s == '\\' && flags == MatchFlags.Windows))
-            {
-                separator = true;
-            }
-            else if (separator)
-            {
-                separator = false;
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    private static ReadOnlySpan<char> GetPartialPattern(string pattern, MatchFlags flags, int depth)
-    {
-        ref var s = ref Unsafe.AsRef(in pattern.GetPinnableReference());
-        ref var e = ref Unsafe.Add(ref s, pattern.Length);
-
-        while (Unsafe.IsAddressLessThan(ref s, ref e) && (s == '/' || (s == '\\' && flags == MatchFlags.Windows)))
-            s = ref Unsafe.Add(ref s, 1);
-
-        var separator = true;
-        var i = (nint)0;
-
-        for (; i < pattern.Length; i++)
-        {
-            var ch = Unsafe.Add(ref s, i);
-            if (ch == '/' || (ch == '\\' && flags == MatchFlags.Windows))
-            {
-                separator = true;
-                if (depth == 0)
-                    break;
-            }
-            else if (separator)
-            {
-                separator = false;
-                depth--;
-
-                if (Unsafe.As<char, int>(ref Unsafe.Add(ref s, i)) == ('*' << 16 | '*'))
-                {
-                    var c = Unsafe.Add(ref s, i + 2);
-                    if (c == '/' || (c == '\\' && flags == MatchFlags.Windows) || i + 2 >= pattern.Length)
-                    {
-                        i += 2;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return MemoryMarshal.CreateReadOnlySpan(ref s, (int)i);
     }
 
     private static void WriteRelativePath(ref FileSystemEntry entry, scoped Span<char> buffer)
@@ -220,10 +152,16 @@ partial class Files
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int ComputeRelativePathLength(ref FileSystemEntry entry) =>
-        entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
+    private static int GetRelativePathLength(ref FileSystemEntry entry)
+    {
+        // AggressiveInlining
+        // ------------------
+        // This method is 47 bytes of IL code consisting solely of calls (6 calls),
+        // and JIT refuses to inline it, even though the x86-64 output results
+        // in a small set of instructions.
+        return entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
+    }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void UpdatePathSeparators(scoped Span<char> path, MatchFlags flags)
     {
         // To enable escaping in Windows systems, we convert backslashes (\) to forward slashes (/).

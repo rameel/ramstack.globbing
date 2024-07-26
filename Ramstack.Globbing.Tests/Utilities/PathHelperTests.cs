@@ -1,71 +1,102 @@
-namespace Ramstack.Globbing.Utilities;
+﻿namespace Ramstack.Globbing.Utilities;
 
 [TestFixture]
-public class PathHelperTests
+public partial class PathHelperTests
 {
-    [Test]
-    public void ConvertToForwardSlashes_NothingChange()
+    [TestCase("", 1)]
+    [TestCase("//", 1)]
+    [TestCase("/dir1", 1)]
+    [TestCase("dir1", 1)]
+    [TestCase("/dir1/dir2/", 2)]
+    [TestCase("dir1/dir2", 2)]
+    [TestCase("dir1/dir2/", 2)]
+    [TestCase("///dir1/dir2////", 2)]
+    public void CountPathSegmentsTests(string path, int expected)
     {
-        for (var n = 0; n < 512; n++)
-        {
-            var original = new string('\\', n + 16).ToCharArray().AsSpan();
-            var span = original[8..^8];
-            span.Fill('a');
+        Assert.That(
+            PathHelper.CountPathSegments(path, MatchFlags.Windows),
+            Is.EqualTo(expected));
 
-            var expected = original.ToString();
-            PathHelper.ConvertToForwardSlashes(span);
+        Assert.That(
+            PathHelper.CountPathSegments(path, MatchFlags.Unix),
+            Is.EqualTo(expected));
 
-            Assert.That(original.ToString(), Is.EqualTo(expected));
-        }
+        Assert.That(
+            PathHelper.CountPathSegments(path.Replace('/', '\\'), MatchFlags.Windows),
+            Is.EqualTo(expected));
     }
 
-    [Test]
-    public void ConvertToForwardSlashes_ChangesAll()
+    [TestCase("/dir1/dir2/", 1, "/dir1")]
+    [TestCase("/dir1/dir2/", 2, "/dir1/dir2")]
+    [TestCase("/dir1/dir2/", 3, "/dir1/dir2/")]
+    [TestCase("/dir1/dir2/", 9, "/dir1/dir2/")]
+    [TestCase("dir1/dir2/", 1, "dir1")]
+    [TestCase("dir1/dir2/", 2, "dir1/dir2")]
+    [TestCase("dir1/dir2/", 3, "dir1/dir2/")]
+    [TestCase("dir1/dir2/", 9, "dir1/dir2/")]
+    [TestCase("dir1/dir2", 1, "dir1")]
+    [TestCase("dir1/dir2", 2, "dir1/dir2")]
+    [TestCase("dir1/dir2", 3, "dir1/dir2")]
+    [TestCase("dir1/dir2", 9, "dir1/dir2")]
+    [TestCase("/1/2/3/4/5/6/7/8/", 1, "/1")]
+    [TestCase("/1/2/3/4/5/6/7/8/", 2, "/1/2")]
+    [TestCase("/1/2/3/4/5/6/7/8/", 3, "/1/2/3")]
+    [TestCase("/1/2/3/4/5/6/7/8/", 4, "/1/2/3/4")]
+    [TestCase("/1/2/3/4/5/6/7/8/", 5, "/1/2/3/4/5")]
+    [TestCase("/1/2/3/4/5/6/7/8/", 6, "/1/2/3/4/5/6")]
+    [TestCase("/1/2/3/4/5/6/7/8/", 7, "/1/2/3/4/5/6/7")]
+    [TestCase("/1/2/3/4/5/6/7/8/", 8, "/1/2/3/4/5/6/7/8")]
+    [TestCase("/1/2/3/4/5/6/7/8/", 9, "/1/2/3/4/5/6/7/8/")]
+    [TestCase("/1/2/3/4/5/6/7/8/", 10, "/1/2/3/4/5/6/7/8/")]
+    [TestCase("", 1, "")]
+    [TestCase("", 2, "")]
+    [TestCase("", 3, "")]
+    [TestCase("/", 1, "/")]
+    [TestCase("/", 2, "/")]
+    [TestCase("/", 3, "/")]
+    [TestCase("////", 2, "////")]
+    [TestCase("////dir1/dir2////", 1, "////dir1")]
+    [TestCase("////dir1/dir2////", 2, "////dir1/dir2")]
+    [TestCase("////dir1/dir2////", 3, "////dir1/dir2////")]
+    [TestCase("**", 1, "**")]
+    [TestCase("**", 2, "**")]
+    [TestCase("**", 3, "**")]
+    [TestCase("/**", 1, "/**")]
+    [TestCase("/**", 2, "/**")]
+    [TestCase("/**", 3, "/**")]
+    [TestCase("**/", 1, "**")]
+    [TestCase("**/", 2, "**")]
+    [TestCase("**/", 3, "**")]
+    [TestCase("/**/", 1, "/**")]
+    [TestCase("/**/", 2, "/**")]
+    [TestCase("/**/", 3, "/**")]
+    [TestCase("**/dir1/dir2", 1, "**")]
+    [TestCase("**/dir1/dir2", 2, "**")]
+    [TestCase("**/dir1/dir2", 3, "**")]
+    [TestCase("**/dir1/dir2", 4, "**")]
+    [TestCase("/**/dir1/dir2", 1, "/**")]
+    [TestCase("/**/dir1/dir2", 2, "/**")]
+    [TestCase("/**/dir1/dir2", 3, "/**")]
+    [TestCase("/**/dir1/dir2", 4, "/**")]
+    [TestCase("dir1/**/dir2/dir3", 1, "dir1")]
+    [TestCase("dir1/**/dir2/dir3", 2, "dir1/**")]
+    [TestCase("dir1/**/dir2/dir3", 3, "dir1/**")]
+    [TestCase("dir1/**/dir2/dir3", 4, "dir1/**")]
+    public void GetPartialPatternTests(string path, int depth, string expected)
     {
-        for (var n = 0; n < 512; n++)
-        {
-            var original = new string('@', n + 16).ToCharArray().AsSpan();
-            var span = original[8..^8];
-            span.Fill('\\');
+        Assert.That(
+            PathHelper.GetPartialPattern(path, MatchFlags.Windows, depth).ToString(),
+            Is.EqualTo(expected));
 
-            var expected = original.ToString().Replace('\\', '/').Replace('@', '\\');
-            PathHelper.ConvertToForwardSlashes(span);
+        Assert.That(
+            PathHelper.GetPartialPattern(path, MatchFlags.Unix, depth).ToString(),
+            Is.EqualTo(expected));
 
-            Assert.That(original.ToString().Replace('@', '\\'), Is.EqualTo(expected));
-        }
-    }
+        path = path.Replace('/', '\\');
+        expected = expected.Replace('/', '\\');
 
-    [Test]
-    public void ConvertToForwardSlashes_ForwardSlahes()
-    {
-        for (var n = 0; n < 512; n++)
-        {
-            var original = new string('@', n + 16).ToCharArray().AsSpan();
-            var span = original[8..^8];
-            span.Fill('/');
-
-            var expected = original.ToString().Replace('\\', '/').Replace('@', '\\');
-            PathHelper.ConvertToForwardSlashes(span);
-
-            Assert.That(original.ToString().Replace('@', '\\'), Is.EqualTo(expected));
-        }
-    }
-
-    [Test]
-    public void ConvertToForwardSlashes_RareChanges()
-    {
-        for (var n = 0; n < 512; n++)
-        {
-            var original = new string('@', n + 16).ToCharArray().AsSpan();
-            var span = original[8..^8];
-            for (var i = 0; i < span.Length; i++)
-                if (i % 7 == 0)
-                    span[i] = '\\';
-
-            var expected = original.ToString().Replace('\\', '/').Replace('@', '\\');
-            PathHelper.ConvertToForwardSlashes(span);
-
-            Assert.That(original.ToString().Replace('@', '\\'), Is.EqualTo(expected));
-        }
+        Assert.That(
+            PathHelper.GetPartialPattern(path, MatchFlags.Windows, depth).ToString(),
+            Is.EqualTo(expected));
     }
 }
