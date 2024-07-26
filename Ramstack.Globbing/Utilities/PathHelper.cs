@@ -116,12 +116,6 @@ internal static class PathHelper
         // Replace(this Span<char> span, char oldValue, char newValue) is only available
         // starting from .NET 8. Since we need to support earlier versions of .NET,
         // we are using our own implementation.
-        //
-        // We are limiting ourselves to 128-bit vector registers in this implementation.
-        // Path lengths are typically small, so there is no significant benefit
-        // in using 256-bit or 512-bit vector instructions. In addition, including
-        // support for larger vector sizes would complicate the code without providing
-        // noticeable performance improvements.
 
         if (Sse41.IsSupported && length >= Vector128<ushort>.Count)
         {
@@ -133,18 +127,11 @@ internal static class PathHelper
             var backslash = Vector128.Create((ushort)'\\');
             var tail = length - Vector128<ushort>.Count;
 
-            // +------+------+------+------+------+---+ DATA
-            //                                 +------+ TAIL
+            // +------+------+------+------+------+------+---+ DATA
+            //                                        +------+ TAIL
             //
-            // After the main loop, only one final vector operation is needed
-            // for the 'tail' block.
-            //
-            //
-            // The pre-condition check in the `while (i < tail)` loop is only
-            // effective when `length == Vector<ushort>.Count`. For all other lengths,
-            // the condition will always be false, making the check unnecessary.
-            // If we move the check to the post-condition, we incur an extra one write,
-            // but only if `length == Vector<ushort>.Count`.
+            // After the main loop, only one final vector operation
+            // is needed for the 'tail' block.
 
             do
             {
@@ -157,6 +144,7 @@ internal static class PathHelper
             }
             while (i < tail);
 
+            // an extra one write for the 'length == Vector<ushort>.Count'
             value = LoadVector(ref p, tail);
             mask = CompareEqual(value, backslash);
             result = ConditionalSelect(value, slash, mask);
