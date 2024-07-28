@@ -86,10 +86,22 @@ public partial class PathHelperTests
     [TestCase("/**/dir1/dir2", 2, "/**")]
     [TestCase("/**/dir1/dir2", 3, "/**")]
     [TestCase("/**/dir1/dir2", 4, "/**")]
+    [TestCase("**/long_directory_name_1/long_directory_name_2", 1, "**")]
+    [TestCase("**/long_directory_name_1/long_directory_name_2", 2, "**")]
+    [TestCase("**/long_directory_name_1/long_directory_name_2", 3, "**")]
+    [TestCase("**/long_directory_name_1/long_directory_name_2", 4, "**")]
+    [TestCase("/**/long_directory_name_1/long_directory_name_2", 1, "/**")]
+    [TestCase("/**/long_directory_name_1/long_directory_name_2", 2, "/**")]
+    [TestCase("/**/long_directory_name_1/long_directory_name_2", 3, "/**")]
+    [TestCase("/**/long_directory_name_1/long_directory_name_2", 4, "/**")]
     [TestCase("dir1/**/dir2/dir3", 1, "dir1")]
     [TestCase("dir1/**/dir2/dir3", 2, "dir1/**")]
     [TestCase("dir1/**/dir2/dir3", 3, "dir1/**")]
     [TestCase("dir1/**/dir2/dir3", 4, "dir1/**")]
+    [TestCase("long_directory_name_1/**/long_directory_name_2/long_directory_name_3", 1, "long_directory_name_1")]
+    [TestCase("long_directory_name_1/**/long_directory_name_2/long_directory_name_3", 2, "long_directory_name_1/**")]
+    [TestCase("long_directory_name_1/**/long_directory_name_2/long_directory_name_3", 3, "long_directory_name_1/**")]
+    [TestCase("long_directory_name_1/**/long_directory_name_2/long_directory_name_3", 4, "long_directory_name_1/**")]
     public void GetPartialPattern(string path, int depth, string expected)
     {
         Assert.That(
