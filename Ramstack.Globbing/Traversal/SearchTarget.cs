@@ -1,4 +1,4 @@
-﻿namespace Ramstack.Globbing.Traversal;
+namespace Ramstack.Globbing.Traversal;
 
 /// <summary>
 /// Specifies the search targets for enumeration.
