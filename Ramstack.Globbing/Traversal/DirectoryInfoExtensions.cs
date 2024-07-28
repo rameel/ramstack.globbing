@@ -1,4 +1,4 @@
-﻿using System.IO.Enumeration;
+using System.IO.Enumeration;
 
 namespace Ramstack.Globbing.Traversal;
 
@@ -761,6 +761,7 @@ public static class DirectoryInfoExtensions
             ShouldRecursePredicate = (ref FileSystemEntry entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
         };
     }
+
     private static IEnumerable<DirectoryInfo> EnumerateDirectories(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
         flags = Files.AdjustMatchFlags(flags);
@@ -771,6 +772,7 @@ public static class DirectoryInfoExtensions
             ShouldRecursePredicate = (ref FileSystemEntry entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
         };
     }
+
     private static IEnumerable<FileSystemInfo> EnumerateInfos(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
         flags = Files.AdjustMatchFlags(flags);
