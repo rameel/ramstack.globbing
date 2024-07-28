@@ -375,7 +375,7 @@ internal static class PathHelper
         /// <summary>
         /// Initializes a new instance of the <see cref="PathSegmentIterator"/> structure.
         /// </summary>
-        /// <param name="length">The path length</param>
+        /// <param name="length">The path length.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public PathSegmentIterator(int length) =>
             (_last, _length) = (-1, (nint)(uint)length);
