@@ -1,4 +1,4 @@
-﻿namespace Ramstack.Globbing.Traversal.Helpers;
+namespace Ramstack.Globbing.Traversal.Helpers;
 
 public sealed class TempFileStorage : IDisposable
 {

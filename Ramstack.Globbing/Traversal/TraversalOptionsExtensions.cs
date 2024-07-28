@@ -1,4 +1,4 @@
-﻿namespace Ramstack.Globbing.Traversal;
+namespace Ramstack.Globbing.Traversal;
 
 /// <summary>
 /// Provides extension methods for the <see cref="TraversalOptions"/> class.
