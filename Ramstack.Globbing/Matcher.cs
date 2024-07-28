@@ -132,7 +132,7 @@ public static unsafe class Matcher
     /// <returns>
     /// <see langword="true" /> if the pattern matches the path; otherwise, <see langword="false" />.
     /// </returns>
-    public static bool IsMatch(ReadOnlySpan<char> path, ReadOnlySpan<char> pattern, MatchFlags flags = MatchFlags.Auto)
+    public static bool IsMatch(scoped ReadOnlySpan<char> path, scoped ReadOnlySpan<char> pattern, MatchFlags flags = MatchFlags.Auto)
     {
         return IsMatchImpl(
             ref MemoryMarshal.GetReference(path),
@@ -225,7 +225,7 @@ public static unsafe class Matcher
                 // This occurs because:
                 // - Each '*' character occupies exactly 2 bytes in UTF-16.
                 // - The value of each character (0x002A) is symmetrical with respect to byte order.
-                if (Length(p, pe) == 2 && Unsafe.Read<int>(p) == ('*' << 16 | '*'))
+                if (p + 2 == pe && Unsafe.ReadUnaligned<int>(p) == ('*' << 16 | '*'))
                 {
                     p = SkipSlash<TFlags>(pe, pend);
 

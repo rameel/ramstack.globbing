@@ -138,17 +138,16 @@ partial class Files
 
     private static void WriteRelativePath(ref FileSystemEntry entry, scoped Span<char> buffer)
     {
-        var directoryLength = entry.Directory.Length;
         var rootLength = entry.RootDirectory.Length;
-        var relativeLength = directoryLength - rootLength;
+        var directoryLength = entry.Directory.Length;
+        var start = directoryLength - rootLength;
 
         entry.Directory.Slice(rootLength).CopyTo(buffer);
-        buffer[relativeLength ] = '/';
-
-        buffer = buffer.Slice(relativeLength  + 1);
+        buffer[start ] = '/';
+        buffer = buffer.Slice(start  + 1);
+        entry.FileName.CopyTo(buffer);
 
         Debug.Assert(buffer.Length == entry.FileName.Length);
-        entry.FileName.CopyTo(buffer);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -169,6 +168,6 @@ partial class Files
         // Otherwise, the backslash (\) in the path will be treated as an escape character,
         // and as a result, the `Unix` flag will essentially not work on a Windows system.
         if (Path.DirectorySeparatorChar == '\\' && flags == MatchFlags.Unix)
-            PathHelper.ConvertToForwardSlashes(path);
+            PathHelper.ConvertPathToPosixStyle(path);
     }
 }

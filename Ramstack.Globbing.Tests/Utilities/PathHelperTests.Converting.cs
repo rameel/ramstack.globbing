@@ -3,7 +3,7 @@ namespace Ramstack.Globbing.Utilities;
 partial class PathHelperTests
 {
     [Test]
-    public void ConvertToForwardSlashes_NothingChange()
+    public void ConvertPathToPosixStyle_NothingChange()
     {
         for (var n = 0; n < 512; n++)
         {
@@ -12,14 +12,14 @@ partial class PathHelperTests
             span.Fill('a');
 
             var expected = original.ToString();
-            PathHelper.ConvertToForwardSlashes(span);
+            PathHelper.ConvertPathToPosixStyle(span);
 
             Assert.That(original.ToString(), Is.EqualTo(expected));
         }
     }
 
     [Test]
-    public void ConvertToForwardSlashes_ChangesAll()
+    public void ConvertPathToPosixStyle_ChangesAll()
     {
         for (var n = 0; n < 512; n++)
         {
@@ -28,14 +28,14 @@ partial class PathHelperTests
             span.Fill('\\');
 
             var expected = original.ToString().Replace('\\', '/').Replace('@', '\\');
-            PathHelper.ConvertToForwardSlashes(span);
+            PathHelper.ConvertPathToPosixStyle(span);
 
             Assert.That(original.ToString().Replace('@', '\\'), Is.EqualTo(expected));
         }
     }
 
     [Test]
-    public void ConvertToForwardSlashes_ForwardSlahes()
+    public void ConvertPathToPosixStyle_ForwardSlashes()
     {
         for (var n = 0; n < 512; n++)
         {
@@ -44,14 +44,14 @@ partial class PathHelperTests
             span.Fill('/');
 
             var expected = original.ToString().Replace('\\', '/').Replace('@', '\\');
-            PathHelper.ConvertToForwardSlashes(span);
+            PathHelper.ConvertPathToPosixStyle(span);
 
             Assert.That(original.ToString().Replace('@', '\\'), Is.EqualTo(expected));
         }
     }
 
     [Test]
-    public void ConvertToForwardSlashes_RareChanges()
+    public void ConvertPathToPosixStyle_RareChanges()
     {
         for (var n = 0; n < 512; n++)
         {
@@ -62,7 +62,7 @@ partial class PathHelperTests
                     span[i] = '\\';
 
             var expected = original.ToString().Replace('\\', '/').Replace('@', '\\');
-            PathHelper.ConvertToForwardSlashes(span);
+            PathHelper.ConvertPathToPosixStyle(span);
 
             Assert.That(original.ToString().Replace('@', '\\'), Is.EqualTo(expected));
         }
