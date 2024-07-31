@@ -1,4 +1,4 @@
-namespace Ramstack.Globbing.Utilities;
+namespace Ramstack.Globbing.Traversal;
 
 partial class PathHelperTests
 {

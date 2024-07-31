@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
-namespace Ramstack.Globbing.Utilities;
+namespace Ramstack.Globbing.Traversal;
 
 /// <summary>
 /// Provides helper methods for path manipulations.
@@ -142,6 +142,46 @@ internal static class PathHelper
 
             return -1;
         }
+    }
+
+    /// <summary>
+    /// Determines whether the specified path matches any of the specified patterns.
+    /// </summary>
+    /// <param name="path">The path to match for a match.</param>
+    /// <param name="patterns">An array of patterns to match against the path.</param>
+    /// <param name="flags">The matching options to use.</param>
+    /// <returns>
+    /// <see langword="true" /> if the path matches any of the patterns;
+    /// otherwise, <see langword="false" />.
+    /// </returns>
+    public static bool IsMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
+    {
+        foreach (var pattern in patterns)
+            if (Matcher.IsMatch(path, pattern, flags))
+                return true;
+
+        return false;
+    }
+
+    /// <summary>
+    /// Determines whether the specified path partially matches any of the specified patterns.
+    /// </summary>
+    /// <param name="path">The path to be partially matched.</param>
+    /// <param name="patterns">An array of patterns to match against the path.</param>
+    /// <param name="flags">The matching options to use.</param>
+    /// <returns>
+    /// <see langword="true" /> if the path partially matches any of the patterns;
+    /// otherwise, <see langword="false" />.
+    /// </returns>
+    public static bool IsPartialMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
+    {
+        var count = CountPathSegments(path, flags);
+
+        foreach (var pattern in patterns)
+            if (Matcher.IsMatch(path, GetPartialPattern(pattern, flags, count), flags))
+                return true;
+
+        return false;
     }
 
     /// <summary>
