@@ -3,8 +3,6 @@ using System.Diagnostics;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 
-using Ramstack.Globbing.Utilities;
-
 namespace Ramstack.Globbing.Traversal;
 
 partial class Files
@@ -45,8 +43,8 @@ partial class Files
         UpdatePathSeparators(relativePath, flags);
 
         var matched = (target & current) != 0
-            && IsLeafMatch(relativePath, excludes, flags) == false
-            && IsLeafMatch(relativePath, patterns, flags);
+            && PathHelper.IsMatch(relativePath, excludes, flags) == false
+            && PathHelper.IsMatch(relativePath, patterns, flags);
 
         if (rented is not null)
             ArrayPool<char>.Shared.Return(rented);
@@ -78,8 +76,8 @@ partial class Files
         WriteRelativePath(ref entry, relativePath);
         UpdatePathSeparators(relativePath, flags);
 
-        var matched = IsLeafMatch(relativePath, excludes, flags) == false
-            && IsPartialMatch(relativePath, patterns, flags);
+        var matched = PathHelper.IsMatch(relativePath, excludes, flags) == false
+            && PathHelper.IsPartialMatch(relativePath, patterns, flags);
 
         if (rented is not null)
             ArrayPool<char>.Shared.Return(rented);
@@ -115,26 +113,6 @@ partial class Files
     /// </returns>
     internal static string[] ToExcludes(string? exclude) =>
         exclude is not null ? [exclude] : [];
-
-    private static bool IsLeafMatch(ReadOnlySpan<char> fullName, string[] patterns, MatchFlags flags)
-    {
-        foreach (var pattern in patterns)
-            if (Matcher.IsMatch(fullName, pattern, flags))
-                return true;
-
-        return false;
-    }
-
-    private static bool IsPartialMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
-    {
-        var count = PathHelper.CountPathSegments(path, flags);
-
-        foreach (var pattern in patterns)
-            if (Matcher.IsMatch(path, PathHelper.GetPartialPattern(pattern, flags, count), flags))
-                return true;
-
-        return false;
-    }
 
     private static void WriteRelativePath(ref FileSystemEntry entry, scoped Span<char> buffer)
     {
