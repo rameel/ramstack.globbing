@@ -93,7 +93,7 @@ public static unsafe class Matcher
     /// </list>
     /// </remarks>
     /// <param name="path">The path to test for a match.</param>
-    /// <param name="pattern">The glob pattern to match against.</param>
+    /// <param name="pattern">The glob pattern to match against the path.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// <see langword="true" /> if the pattern matches the path; otherwise, <see langword="false" />.
@@ -127,7 +127,7 @@ public static unsafe class Matcher
     /// </list>
     /// </remarks>
     /// <param name="path">The path to test for a match.</param>
-    /// <param name="pattern">The glob pattern to match against.</param>
+    /// <param name="pattern">The glob pattern to match against the path.</param>
     /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
     /// <returns>
     /// <see langword="true" /> if the pattern matches the path; otherwise, <see langword="false" />.
