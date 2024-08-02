@@ -71,6 +71,7 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
     private IEnumerable<TResult> Enumerate()
     {
         var chars = ArrayPool<char>.Shared.Rent(512);
+
         var stack = new Stack<(TEntry Directory, string Path)>();
         stack.Push((_directory, ""));
 
@@ -81,33 +82,23 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
                 var name = FileNameSelector(entry);
                 var fullName = GetFullName(ref chars, e.Path, name);
 
-                if (ShouldRecurseInto(entry, fullName))
-                    stack.Push((entry, fullName.ToString()));
+                if (PathHelper.IsMatch(fullName, Excludes, Flags))
+                    continue;
 
-                if (ShouldIncludeEntry(entry, fullName))
-                    yield return ResultSelector(entry);
+                if (ShouldRecursePredicate == null || ShouldRecursePredicate(entry))
+                    if (PathHelper.IsPartialMatch(fullName, Patterns, Flags))
+                        stack.Push((entry, fullName.ToString()));
+
+                if (ShouldIncludePredicate == null || ShouldIncludePredicate(entry))
+                    if (PathHelper.IsMatch(fullName, Patterns, Flags))
+                        yield return ResultSelector(entry);
             }
         }
 
         ArrayPool<char>.Shared.Return(chars);
     }
 
-    private bool ShouldRecurseInto(TEntry entry, ReadOnlySpan<char> path) =>
-        (ShouldRecursePredicate?.Invoke(entry) ?? true) && IsPartialMatch(path);
-
-    private bool ShouldIncludeEntry(TEntry entry, ReadOnlySpan<char> path) =>
-        (ShouldIncludePredicate?.Invoke(entry) ?? true) && IsIncluded(path);
-
-    private bool IsIncluded(ReadOnlySpan<char> path) =>
-        !IsExcluded(path) && PathHelper.IsMatch(path, Patterns, Flags);
-
-    private bool IsPartialMatch(ReadOnlySpan<char> path) =>
-        !IsExcluded(path) && PathHelper.IsPartialMatch(path, Patterns, Flags);
-
-    private bool IsExcluded(ReadOnlySpan<char> path) =>
-        PathHelper.IsMatch(path, Excludes, Flags);
-
-    private ReadOnlySpan<char> GetFullName(ref char[] chars, string path, string name)
+    private static ReadOnlySpan<char> GetFullName(ref char[] chars, string path, string name)
     {
         var length = path.Length + name.Length + 1;
         if (chars.Length <= length)
@@ -118,12 +109,12 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
             _ = chars.Length;
         }
 
-        var buffer = chars.AsSpan(0, length);
+        var fullName = chars.AsSpan(0, length);
 
-        path.CopyTo(buffer);
-        buffer[path.Length] = '/';
-        name.CopyTo(buffer.Slice(path.Length + 1));
+        path.CopyTo(fullName);
+        fullName[path.Length] = '/';
+        name.CopyTo(fullName.Slice(path.Length + 1));
 
-        return buffer;
+        return fullName;
     }
 }
