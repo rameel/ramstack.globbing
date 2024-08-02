@@ -21,4 +21,6 @@ internal sealed class RequiredMemberAttribute : Attribute;
 /// </summary>
 /// <param name="featureName">The name of the required compiler feature.</param>
 [AttributeUsage(AttributeTargets.All, AllowMultiple = true, Inherited = false)]
+#pragma warning disable CS9113 // Parameter is unread.
 internal sealed class CompilerFeatureRequiredAttribute(string featureName) : Attribute;
+#pragma warning restore CS9113 // Parameter is unread.
