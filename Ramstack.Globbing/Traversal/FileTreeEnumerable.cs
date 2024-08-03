@@ -70,6 +70,8 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
 
     private IEnumerable<TResult> Enumerate()
     {
+        var chars = ArrayPool<char>.Shared.Rent(512);
+
         var stack = new Stack<(TEntry Directory, string Path)>();
         stack.Push((_directory, ""));
 
@@ -77,62 +79,40 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
         {
             foreach (var entry in ChildrenSelector(e.Directory))
             {
-                var fileName = FileNameSelector(entry);
+                var name = FileNameSelector(entry);
+                var fullName = GetFullName(ref chars, e.Path, name);
 
-                if (ShouldRecurseInto(entry, e.Path, fileName))
-                    stack.Push((entry, $"{e.Path}/{fileName}"));
+                if (PathHelper.IsMatch(fullName, Excludes, Flags))
+                    continue;
 
-                if (ShouldIncludeEntry(entry, e.Path, fileName))
-                    yield return ResultSelector(entry);
+                if (ShouldRecursePredicate == null || ShouldRecursePredicate(entry))
+                    if (PathHelper.IsPartialMatch(fullName, Patterns, Flags))
+                        stack.Push((entry, fullName.ToString()));
+
+                if (ShouldIncludePredicate == null || ShouldIncludePredicate(entry))
+                    if (PathHelper.IsMatch(fullName, Patterns, Flags))
+                        yield return ResultSelector(entry);
             }
         }
+
+        ArrayPool<char>.Shared.Return(chars);
     }
 
-    private bool ShouldRecurseInto(TEntry entry, string path, string name)
+    private static ReadOnlySpan<char> GetFullName(ref char[] chars, string path, string name)
     {
-        return (ShouldRecursePredicate?.Invoke(entry) ?? true) && ExecutePredicate(path, name, Predicate);
-        bool Predicate(in Span<char> buffer) => IsPartialMatch(buffer);
-    }
-
-    private bool ShouldIncludeEntry(TEntry entry, string path, string name)
-    {
-        return (ShouldIncludePredicate?.Invoke(entry) ?? true) && ExecutePredicate(path, name, Predicate);
-        bool Predicate(in Span<char> buffer) => IsIncluded(buffer);
-    }
-
-    private bool IsIncluded(ReadOnlySpan<char> path) =>
-        !IsExcluded(path) && PathHelper.IsMatch(path, Patterns, Flags);
-
-    private bool IsPartialMatch(ReadOnlySpan<char> path) =>
-        !IsExcluded(path) && PathHelper.IsPartialMatch(path, Patterns, Flags);
-
-    private bool IsExcluded(ReadOnlySpan<char> path) =>
-        PathHelper.IsMatch(path, Excludes, Flags);
-
-    private static bool ExecutePredicate(string path, string name, Predicate predicate)
-    {
-        const int stackallocThreshold = 192;
-
-        char[]? rented = null;
-
         var length = path.Length + name.Length + 1;
-        var buffer = length <= stackallocThreshold
-            ? stackalloc char[stackallocThreshold]
-            : rented = ArrayPool<char>.Shared.Rent(length);
+        if (chars.Length <= length)
+        {
+            ArrayPool<char>.Shared.Return(chars);
+            chars = ArrayPool<char>.Shared.Rent(length);
+        }
 
-        buffer = buffer[..length];
+        var fullName = chars.AsSpan(0, length);
 
-        path.CopyTo(buffer);
-        buffer[path.Length] = '/';
-        name.CopyTo(buffer.Slice(path.Length + 1));
+        path.TryCopyTo(fullName);
+        fullName[path.Length] = '/';
+        name.TryCopyTo(fullName.Slice(path.Length + 1));
 
-        var matched = predicate(in buffer);
-
-        if (rented is not null)
-            ArrayPool<char>.Shared.Return(rented);
-
-        return matched;
+        return fullName;
     }
-
-    private delegate bool Predicate(in Span<char> path);
 }

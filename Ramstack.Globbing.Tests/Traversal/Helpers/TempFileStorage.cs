@@ -34,6 +34,7 @@ public sealed class TempFileStorage : IDisposable
             "project/tests/TestMain.cs",
             "project/tests/TestUtils.cs",
             "project/tests/Tests.csproj",
+            "project/tests/Fixtures/Module.cs",
             "project/tests/Fixtures/SampleData.json",
             "project/tests/Fixtures/MockResponses.xml",
 
