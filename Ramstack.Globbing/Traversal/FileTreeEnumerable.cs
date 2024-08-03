@@ -101,7 +101,7 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
     private static ReadOnlySpan<char> GetFullName(ref char[] chars, string path, string name)
     {
         var length = path.Length + name.Length + 1;
-        if (chars.Length <= length)
+        if (chars.Length < length)
         {
             ArrayPool<char>.Shared.Return(chars);
             chars = ArrayPool<char>.Shared.Rent(length);

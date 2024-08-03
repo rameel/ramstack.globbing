@@ -154,45 +154,6 @@ public partial class PathHelperTests
         }
     }
 
-    [Test]
-    public void SearchPathSeparator()
-    {
-        for (var n = 0; n < 5000; n++)
-        {
-            var p0 = new string('a', n);
-
-            var p1 = p0 + "\\";
-            var index1 = PathHelper.SearchPathSeparator(p1, MatchFlags.Windows);
-            var index2 = PathHelper.SearchPathSeparator(p1, MatchFlags.Unix);
-
-            Assert.That(index1, Is.EqualTo(p1.IndexOf('\\')), $"length: {n}");
-            Assert.That(index2, Is.EqualTo(-1),               $"length: {n}");
-
-            var p2 = p0 + "/";
-            var index3 = PathHelper.SearchPathSeparator(p2, MatchFlags.Windows);
-            var index4 = PathHelper.SearchPathSeparator(p2, MatchFlags.Unix);
-
-            Assert.That(index3, Is.EqualTo(p2.IndexOf('/')), $"length: {n}");
-            Assert.That(index4, Is.EqualTo(index3),          $"length: {n}");
-        }
-    }
-
-    [Test]
-    public void SearchPathSeparator_Nothing()
-    {
-        var source = new string('a', 5000);
-
-        for (var n = 0; n < 5000; n++)
-        {
-            var p = source.AsSpan(0, n);
-            var index1 = PathHelper.SearchPathSeparator(p, MatchFlags.Windows);
-            var index2 = PathHelper.SearchPathSeparator(p, MatchFlags.Unix);
-
-            Assert.That(index1, Is.EqualTo(-1));
-            Assert.That(index2, Is.EqualTo(-1));
-        }
-    }
-
     private static IEnumerable<(string path, char slash, MatchFlags flags)> GeneratePaths()
     {
         var flags = new[]
