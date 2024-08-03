@@ -105,15 +105,13 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
         {
             ArrayPool<char>.Shared.Return(chars);
             chars = ArrayPool<char>.Shared.Rent(length);
-            // Force non-null assumption
-            _ = chars.Length;
         }
 
         var fullName = chars.AsSpan(0, length);
 
-        path.CopyTo(fullName);
+        path.TryCopyTo(fullName);
         fullName[path.Length] = '/';
-        name.CopyTo(fullName.Slice(path.Length + 1));
+        name.TryCopyTo(fullName.Slice(path.Length + 1));
 
         return fullName;
     }
