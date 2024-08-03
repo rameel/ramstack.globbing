@@ -102,7 +102,8 @@ Similarly, for the `a/**/a/**/a/**/.../a/**/a/**/a/**/b` pattern matching agains
 
 ## File traversal
 
-The `Files` class provides functionality for traversing the file system and retrieving lists of files and directories based on specified glob patterns. This allows for flexible and efficient file and directory enumeration.
+The `Files` class provides functionality for traversing the file system and retrieving lists of files and directories
+based on specified glob patterns. This allows for flexible and efficient file and directory enumeration.
 
 ```csharp
 using Ramstack.Globbing.Traversal;
@@ -128,7 +129,71 @@ foreach (var file in files)
     Console.WriteLine(file);
 ```
 
+There are overloads that take a `TraversalOptions` allowing you to set additional options when traversing the file system,
+such as:
+- Filtering out specific attributes
+- Ignoring inaccessible files
+- Maximum recursion depth
+
+These methods are quite efficient in terms of speed, memory consumption, and GC pressure.
+Here are the benchmarking results for the [dotnet/runtime](https://github.com/dotnet/runtime) repository folder, which contained
+59194 files at the time of testing. The search was for `*.md` files:
+
+```
+BenchmarkDotNet v0.13.12, Windows 11 (10.0.22631.3880/23H2/2023Update/SunValley3)
+AMD Ryzen 9 5900X, 1 CPU, 24 logical and 12 physical cores
+.NET SDK 9.0.100-preview.6.24328.19
+  [Host]     : .NET 8.0.7 (8.0.724.31311), X64 RyuJIT AVX2
+  Job-GMSEBO : .NET 8.0.7 (8.0.724.31311), X64 RyuJIT AVX2
+
+Runtime=.NET 8.0
+
+| Method                             | Mean     | Error   | StdDev  | Gen0      | Gen1     | Allocated |
+|----------------------------------- |---------:|--------:|--------:|----------:|---------:|----------:|
+| >> Ramstack_Files_EnumerateFiles   | 154.4 ms | 0.67 ms | 0.59 ms |         - |        - |   2.33 MB |
+| Microsoft_Directory_EnumerateFiles | 149.1 ms | 0.74 ms | 0.66 ms |         - |        - |   2.33 MB |
+| Microsoft_FileSystemGlobbing       | 176.6 ms | 1.16 ms | 1.08 ms | 2000.0000 | 333.3333 |  35.99 MB |
+```
+
+As you can see, the code is as fast as a direct search using `Directory.EnumerateFiles` and consumes the same amount of memory.
+This makes sense, since the implementation of `Files.EnumerateFiles` uses the same `FileSystemEnumerable` class.
+
+Also, corresponding extension methods added for `DirectoryInfo`, which also allow you to leverage
+the full power of glob patterns when searching for files.
+
+## Custom File Systems (`FileTreeEnumerable`)
+
+The `FileTreeEnumerable` class provides support for custom file systems with glob pattern matching capabilities.
+Here is an example of its usage:
+```csharp
+// As an example, we'll use the existing DirectoryInfo/FileInfo classes.
+
+var root = new DirectoryInfo(@"D:\Projects\dotnet.runtime");
+var enumeration = new FileTreeEnumerable<FileSystemInfo, string>(root)
+{
+    Patterns = ["**/*.cs"],
+    Excludes = ["**/bin", "**/obj"],
+    FileNameSelector = info => info.Name,
+    ShouldRecursePredicate = info => info is DirectoryInfo,
+    // The following predicate used to filter the files
+    ShouldIncludePredicate = info => info is FileInfo,
+    ChildrenSelector = info => ((DirectoryInfo)info).EnumerateFileSystemInfos(),
+    // Returns the full path of the file
+    ResultSelector = info => info.FullName
+};
+
+// Prints all csharp files
+foreach (var filePath in enumeration)
+    Console.WriteLine(filePath);
+```
+
+
 ## Changelog
+
+### 2.1.0
+* Added the `FileTreeEnumerable` class for custom file systems with glob pattern support.
+* Added overloads with `TraversalOptions` for file enumeration.
+* Added extension methods for `DirectoryInfo`.
 
 ### 2.0.0
 * Added the ability to retrieve a list of files and directories based on a specified glob pattern.
