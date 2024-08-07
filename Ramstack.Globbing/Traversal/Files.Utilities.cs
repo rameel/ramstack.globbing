@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 
+using Ramstack.Globbing.Internal;
+
 namespace Ramstack.Globbing.Traversal;
 
 partial class Files
