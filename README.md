@@ -3,9 +3,6 @@
 Fast and zero-allocation .NET globbing library for matching file paths using [glob patterns](https://en.wikipedia.org/wiki/Glob_(programming)).
 No external dependencies.
 
-[![.NET](https://github.com/rameel/ramstack.globbing/actions/workflows/test.yml/badge.svg)](https://github.com/rameel/ramstack.globbing/actions/workflows/test.yml)
-
-
 ## Getting Started
 
 To install the `Ramstack.Globbing` [NuGet package](https://www.nuget.org/packages/Ramstack.Globbing) to your project, run the following command:
@@ -161,18 +158,19 @@ This makes sense, since the implementation of `Files.EnumerateFiles` uses the sa
 Also, corresponding extension methods added for `DirectoryInfo`, which also allow you to leverage
 the full power of glob patterns when searching for files.
 
-## Custom File Systems (`FileTreeEnumerable`)
+## Custom File Systems (`FileTreeEnumerable` and `FileTreeAsyncEnumerable`)
 
 The `FileTreeEnumerable` class provides support for custom file systems with glob pattern matching capabilities.
 Here is an example of its usage:
 ```csharp
-// As an example, we'll use the existing DirectoryInfo/FileInfo classes.
+// --------------------------------------------------------------------
+// As an example, we'll use the existing DirectoryInfo/FileInfo classes
 
 var root = new DirectoryInfo(@"D:\Projects\dotnet.runtime");
 var enumeration = new FileTreeEnumerable<FileSystemInfo, string>(root)
 {
     Patterns = ["**/*.cs"],
-    Excludes = ["**/bin", "**/obj"],
+    Excludes = ["**/{bin,obj}"],
     FileNameSelector = info => info.Name,
     ShouldRecursePredicate = info => info is DirectoryInfo,
     // The following predicate used to filter the files
@@ -187,36 +185,32 @@ foreach (var filePath in enumeration)
     Console.WriteLine(filePath);
 ```
 
+### Asynchronous Enumeration (`FileTreeAsyncEnumerable`)
+The `FileTreeAsyncEnumerable` class provides similar functionality to `FileTreeEnumerable`,
+but supports asynchronous enumeration for remote file systems as an example.
 
-## Changelog
+Here's an example of how to use `FileTreeAsyncEnumerable`:
 
-### 2.1.0
-* Added the `FileTreeEnumerable` class for custom file systems with glob pattern support.
-* Added overloads with `TraversalOptions` for file enumeration.
-* Added extension methods for `DirectoryInfo`.
-
-### 2.0.0
-* Added the ability to retrieve a list of files and directories based on a specified glob pattern.
-
-**BREAKING CHANGE**
-
-To improve code readability and adherence to .NET conventions, the order of parameters in the `IsMatch` method has been changed.
-The `path` parameter is now first, followed by the `pattern` parameter.
-
-**New signature**
 ```csharp
-public static bool IsMatch(string path, string pattern, MatchFlags flags = MatchFlags.Auto)
-```
-**Reasons for the change:**
-* Consistency with .NET methods: The primary object of an action is typically the first parameter.
-  Here, `path` is the primary object, and `pattern` is the secondary.
-* Alignment with common APIs: This order matches other .NET methods like `Regex.IsMatch(string input, string pattern)`.
-* Flexibility for future expansions: Having the most commonly varied parameter (pattern) second makes it easier to create intuitive method overloads in the future.
-* **Early stage of development:** Since the library is newly released, we've made this change to ensure consistency from the start.
+// Assuming we have an IAsyncFileSystem implementation
 
-### 1.1.0
-- Change target framework from multi-targeting (`net6.0`;`net8.0`) to single target `net6.0`
-- Replace conditional compilation for `.NET 8` with a universal approach
+var root = asyncFileSystem.GetDirectoryEntry(@"D:\Projects\dotnet.runtime");
+var asyncEnumeration = new FileTreeAsyncEnumerable<IAsyncFileSystemEntry, string>(root)
+{
+    Patterns = ["**/*.cs"],
+    Excludes = ["**/{bin,obj}"],
+    FileNameSelector = entry => entry.Name,
+    ShouldRecursePredicate = entry => entry is IDirectory,
+    ShouldIncludePredicate = entry => entry is IFile,
+    ChildrenSelector = (entry, token) => entry.GetChildrenAsync(token),
+    ResultSelector = entry => entry.FullPath
+};
+
+// Prints all csharp files asynchronously
+await foreach (var filePath in asyncEnumeration)
+    Console.WriteLine(filePath);
+```
+
 
 ## Supported versions
 
