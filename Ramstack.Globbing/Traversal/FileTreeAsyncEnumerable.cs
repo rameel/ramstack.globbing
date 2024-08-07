@@ -2,6 +2,8 @@ using System.Buffers;
 using System.Collections;
 using System.Runtime.CompilerServices;
 
+using Ramstack.Globbing.Internal;
+
 namespace Ramstack.Globbing.Traversal;
 
 /// <summary>
@@ -77,7 +79,7 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
             await foreach (var entry in ChildrenSelector(e.Directory, cancellationToken))
             {
                 var name = FileNameSelector(entry);
-                var fullName = GetFullName(ref chars, e.Path, name);
+                var fullName = FileTreeHelpers.GetFullName(ref chars, e.Path, name);
 
                 if (PathHelper.IsMatch(fullName, Excludes, Flags))
                     continue;
@@ -93,23 +95,5 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
         }
 
         ArrayPool<char>.Shared.Return(chars);
-    }
-
-    private static ReadOnlySpan<char> GetFullName(ref char[] chars, string path, string name)
-    {
-        var length = path.Length + name.Length + 1;
-        if (chars.Length < length)
-        {
-            ArrayPool<char>.Shared.Return(chars);
-            chars = ArrayPool<char>.Shared.Rent(length);
-        }
-
-        var fullName = chars.AsSpan(0, length);
-
-        path.TryCopyTo(fullName);
-        fullName[path.Length] = '/';
-        name.TryCopyTo(fullName.Slice(path.Length + 1));
-
-        return fullName;
     }
 }
