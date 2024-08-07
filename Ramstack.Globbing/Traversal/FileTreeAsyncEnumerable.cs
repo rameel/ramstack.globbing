@@ -1,5 +1,4 @@
 using System.Buffers;
-using System.Collections;
 using System.Runtime.CompilerServices;
 
 using Ramstack.Globbing.Internal;
