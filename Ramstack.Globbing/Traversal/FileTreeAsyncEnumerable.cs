@@ -63,7 +63,7 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
 
     /// <inheritdoc />
     IAsyncEnumerator<TResult> IAsyncEnumerable<TResult>.GetAsyncEnumerator(CancellationToken cancellationToken) =>
-        EnumerateAsync(cancellationToken).GetAsyncEnumerator();
+        EnumerateAsync(cancellationToken).GetAsyncEnumerator(cancellationToken);
 
     private async IAsyncEnumerable<TResult> EnumerateAsync([EnumeratorCancellation] CancellationToken cancellationToken)
     {
