@@ -2,7 +2,7 @@ using System.Buffers;
 
 namespace Ramstack.Globbing.Internal;
 
-internal static class FileTreeHelpers
+internal static class FileTreeHelper
 {
     public static ReadOnlySpan<char> GetFullName(ref char[] chars, string path, string name)
     {

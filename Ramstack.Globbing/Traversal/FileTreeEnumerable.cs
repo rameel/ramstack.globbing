@@ -82,7 +82,7 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
             foreach (var entry in ChildrenSelector(e.Directory))
             {
                 var name = FileNameSelector(entry);
-                var fullName = FileTreeHelpers.GetFullName(ref chars, e.Path, name);
+                var fullName = FileTreeHelper.GetFullName(ref chars, e.Path, name);
 
                 if (PathHelper.IsMatch(fullName, Excludes, Flags))
                     continue;
