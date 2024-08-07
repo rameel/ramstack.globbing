@@ -181,7 +181,7 @@ var enumeration = new FileTreeEnumerable<FileSystemInfo, string>(root)
 };
 
 // Prints all csharp files
-foreach (var filePath in enumeration)
+foreach (string filePath in enumeration)
     Console.WriteLine(filePath);
 ```
 
@@ -192,22 +192,23 @@ but supports asynchronous enumeration for remote file systems as an example.
 Here's an example of how to use `FileTreeAsyncEnumerable`:
 
 ```csharp
+// ---------------------------------------------------
 // Assuming we have an IAsyncFileSystem implementation
 
-var root = asyncFileSystem.GetDirectoryEntry(@"D:\Projects\dotnet.runtime");
-var asyncEnumeration = new FileTreeAsyncEnumerable<IAsyncFileSystemEntry, string>(root)
+var root = cloudFS.GetDirectory(@"/projects/dotnet.runtime");
+var enumeration = new FileTreeAsyncEnumerable<IAsyncFileSystemEntry, string>(root)
 {
     Patterns = ["**/*.cs"],
     Excludes = ["**/{bin,obj}"],
     FileNameSelector = entry => entry.Name,
     ShouldRecursePredicate = entry => entry is IDirectory,
     ShouldIncludePredicate = entry => entry is IFile,
-    ChildrenSelector = (entry, token) => entry.GetChildrenAsync(token),
+    ChildrenSelector = (entry, token) => ((IDirectory)entry).GetFileEntriesAsync(token),
     ResultSelector = entry => entry.FullPath
 };
 
 // Prints all csharp files asynchronously
-await foreach (var filePath in asyncEnumeration)
+await foreach (string filePath in enumeration)
     Console.WriteLine(filePath);
 ```
 
