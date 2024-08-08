@@ -1,3 +1,5 @@
+using Ramstack.Globbing.Internal;
+
 namespace Ramstack.Globbing.Traversal;
 
 partial class PathHelperTests

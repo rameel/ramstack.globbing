@@ -1,16 +1,16 @@
 using System.Buffers;
-using System.Collections;
+using System.Runtime.CompilerServices;
 
 using Ramstack.Globbing.Internal;
 
 namespace Ramstack.Globbing.Traversal;
 
 /// <summary>
-/// Represents an enumerable file tree structure with customizable filtering and selection options.
+/// Represents an asynchronously enumerable file tree structure with customizable filtering and selection options.
 /// </summary>
 /// <typeparam name="TEntry">The type of the entry in the file tree.</typeparam>
 /// <typeparam name="TResult">The type of the result.</typeparam>
-public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
+public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<TResult>
 {
     private readonly TEntry _directory;
 
@@ -48,7 +48,7 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
     /// <summary>
     /// Gets or sets a function that retrieves the child entries of an entry.
     /// </summary>
-    public required Func<TEntry, IEnumerable<TEntry>> ChildrenSelector { get; init; }
+    public required Func<TEntry, CancellationToken, IAsyncEnumerable<TEntry>> ChildrenSelector { get; init; }
 
     /// <summary>
     /// Gets or sets a function that transforms a file entry into a result.
@@ -56,21 +56,17 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
     public required Func<TEntry, TResult> ResultSelector { get; init; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FileTreeEnumerable{TEntry, TResult}"/> class.
+    /// Initializes a new instance of the <see cref="FileTreeAsyncEnumerable{TEntry, TResult}"/> class.
     /// </summary>
     /// <param name="directory">The root directory to start the enumeration from.</param>
-    public FileTreeEnumerable(TEntry directory) =>
+    public FileTreeAsyncEnumerable(TEntry directory) =>
         _directory = directory;
 
     /// <inheritdoc />
-    IEnumerator<TResult> IEnumerable<TResult>.GetEnumerator() =>
-        Enumerate().GetEnumerator();
+    IAsyncEnumerator<TResult> IAsyncEnumerable<TResult>.GetAsyncEnumerator(CancellationToken cancellationToken) =>
+        EnumerateAsync(cancellationToken).GetAsyncEnumerator(cancellationToken);
 
-    /// <inheritdoc />
-    IEnumerator IEnumerable.GetEnumerator() =>
-        Enumerate().GetEnumerator();
-
-    private IEnumerable<TResult> Enumerate()
+    private async IAsyncEnumerable<TResult> EnumerateAsync([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var chars = ArrayPool<char>.Shared.Rent(512);
 
@@ -79,7 +75,7 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
 
         while (stack.TryPop(out var e))
         {
-            foreach (var entry in ChildrenSelector(e.Directory))
+            await foreach (var entry in ChildrenSelector(e.Directory, cancellationToken))
             {
                 var name = FileNameSelector(entry);
                 var fullName = FileTreeHelper.GetFullName(ref chars, e.Path, name);
