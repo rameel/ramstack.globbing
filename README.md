@@ -158,7 +158,7 @@ This makes sense, since the implementation of `Files.EnumerateFiles` uses the sa
 Also, corresponding extension methods added for `DirectoryInfo`, which also allow you to leverage
 the full power of glob patterns when searching for files.
 
-## Custom File Systems (`FileTreeEnumerable` and `FileTreeAsyncEnumerable`)
+## Custom File System Support
 
 The `FileTreeEnumerable` class provides support for custom file systems with glob pattern matching capabilities.
 Here is an example of its usage:
@@ -185,7 +185,7 @@ foreach (string filePath in enumeration)
     Console.WriteLine(filePath);
 ```
 
-### Asynchronous Enumeration (`FileTreeAsyncEnumerable`)
+### Asynchronous Enumeration
 The `FileTreeAsyncEnumerable` class provides similar functionality to `FileTreeEnumerable`,
 but supports asynchronous enumeration for remote file systems as an example.
 
