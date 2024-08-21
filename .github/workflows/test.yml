@@ -14,18 +14,22 @@ jobs:
         os: [ubuntu-latest, windows-latest]
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Build
-        run: dotnet build -c Release --no-restore
+      - name: Build (Debug)
+        run: dotnet build -c Debug
 
-      - name: Test
-        run: dotnet test --no-restore --verbosity normal
+      - name: Build (Release)
+        run: dotnet build -c Release
+
+      - name: Test (Debug)
+        run: dotnet test -c Debug --no-build
+
+      - name: Test (Release)
+        run: dotnet test -c Release --no-build
