@@ -10,18 +10,16 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
 
-      - name: Restore
-        run: dotnet restore
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Build
-        run: dotnet build -c Release --no-restore
+        run: dotnet build -c Release
 
       - name: Pack
         run: dotnet pack -c Release -o ./nuget --no-build

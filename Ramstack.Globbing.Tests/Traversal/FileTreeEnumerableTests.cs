@@ -1,4 +1,4 @@
-﻿using Ramstack.Globbing.Traversal.Helpers;
+using Ramstack.Globbing.Traversal.Helpers;
 
 namespace Ramstack.Globbing.Traversal;
 
