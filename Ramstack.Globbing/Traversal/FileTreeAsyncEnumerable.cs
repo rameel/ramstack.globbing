@@ -91,7 +91,7 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
 
             while (stack.TryPop(out var e))
             {
-                await foreach (var entry in ChildrenSelector(e.Directory, cancellationToken))
+                await foreach (var entry in ChildrenSelector(e.Directory, cancellationToken).ConfigureAwait(false))
                 {
                     var name = FileNameSelector(entry);
                     var fullName = FileTreeHelper.GetFullName(ref chars, e.Path, name);
