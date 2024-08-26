@@ -86,10 +86,10 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
 
         try
         {
-            var stack = new Stack<(TEntry Directory, string Path)>();
-            stack.Push((_directory, ""));
+            var queue = new Queue<(TEntry Directory, string Path)>();
+            queue.Enqueue((_directory, ""));
 
-            while (stack.TryPop(out var e))
+            while (queue.TryDequeue(out var e))
             {
                 await foreach (var entry in ChildrenSelector(e.Directory, cancellationToken).ConfigureAwait(false))
                 {
@@ -101,7 +101,7 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
 
                     if (ShouldRecursePredicate == null || ShouldRecursePredicate(entry))
                         if (PathHelper.IsPartialMatch(fullName, Patterns, Flags))
-                            stack.Push((entry, fullName.ToString()));
+                            queue.Enqueue((entry, fullName.ToString()));
 
                     if (ShouldIncludePredicate == null || ShouldIncludePredicate(entry))
                         if (PathHelper.IsMatch(fullName, Patterns, Flags))
