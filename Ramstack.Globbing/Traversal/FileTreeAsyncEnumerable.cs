@@ -77,7 +77,9 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
                 ? (source = CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken, cancellationToken)).Token
                 : _cancellationToken;
 
+        // ReSharper disable PossiblyMistakenUseOfCancellationToken
         return EnumerateAsync(source, cancellationToken).GetAsyncEnumerator(cancellationToken);
+        // ReSharper restore PossiblyMistakenUseOfCancellationToken
     }
 
     private async IAsyncEnumerable<TResult> EnumerateAsync(CancellationTokenSource? source, [EnumeratorCancellation] CancellationToken cancellationToken)
