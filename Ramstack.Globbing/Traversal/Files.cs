@@ -23,19 +23,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -59,7 +59,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -85,19 +85,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -121,7 +121,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -147,19 +147,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -183,7 +183,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -209,19 +209,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -245,7 +245,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -271,19 +271,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -307,7 +307,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -333,19 +333,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -369,7 +369,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -395,19 +395,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -431,7 +431,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -457,19 +457,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -493,7 +493,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -519,19 +519,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -555,7 +555,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -581,19 +581,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -617,7 +617,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -643,19 +643,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -679,7 +679,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -705,19 +705,19 @@ public static partial class Files
     /// <list type="bullet">
     ///   <item>
     ///     <description>
-    ///       Supported meta-characters include <c>'*'</c>, <c>'?'</c>, <c>'\'</c> and <c>'['</c>, <c>']'</c>.
-    ///       And inside character classes <c>'-'</c>, <c>'!'</c> and <c>']'</c>.
+    ///       Supported meta-characters include <c>"*"</c>, <c>"?"</c>, <c>"\"</c> and <c>"["</c>, <c>"]"</c>.
+    ///       And inside character classes <c>"-"</c>, <c>"!"</c> and <c>"]"</c>.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'.'</c> and <c>'..'</c> symbols do not have any special treatment and are processed
+    ///       The <c>"."</c> and <c>".."</c> symbols do not have any special treatment and are processed
     ///       as regular characters for matching.
     ///     </description>
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       Character classes can be negated by prefixing them with  <c>'!'</c>, such as <c>[!0-9]</c>,
+    ///       Character classes can be negated by prefixing them with  <c>"!"</c>, such as <c>[!0-9]</c>,
     ///       which matches all characters except digits.
     ///     </description>
     ///   </item>
@@ -741,7 +741,7 @@ public static partial class Files
     ///   </item>
     ///   <item>
     ///     <description>
-    ///       The <c>'**'</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
+    ///       The <c>"**"</c> sequence in the glob pattern can be used to match zero or more directories and subdirectories.
     ///       It can be used at the beginning, middle, or end of a pattern, for example,
     ///       <c>"**/file.txt"</c>, <c>"dir/**/*.txt"</c>, <c>"dir/**"</c>.
     ///     </description>
@@ -755,10 +755,10 @@ public static partial class Files
     {
         flags = AdjustMatchFlags(flags);
 
-        return new FileSystemEnumerable<string>(Path.GetFullPath(path), (ref FileSystemEntry entry) => entry.ToFullPath(), options)
+        return new FileSystemEnumerable<string>(Path.GetFullPath(path), (ref entry) => entry.ToFullPath(), options)
         {
-            ShouldIncludePredicate = (ref FileSystemEntry entry) => ShouldInclude(ref entry, patterns, excludes, flags, target),
-            ShouldRecursePredicate = (ref FileSystemEntry entry) => ShouldRecurse(ref entry, patterns, excludes, flags)
+            ShouldIncludePredicate = (ref entry) => ShouldInclude(ref entry, patterns, excludes, flags, target),
+            ShouldRecursePredicate = (ref entry) => ShouldRecurse(ref entry, patterns, excludes, flags)
         };
     }
 }
