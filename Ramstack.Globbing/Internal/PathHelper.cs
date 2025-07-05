@@ -309,7 +309,7 @@ internal static class PathHelper
 
             while (_position < _length)
             {
-                if (_mask != 0)
+                if (Avx2.IsSupported && _mask != 0)
                 {
                     var offset = BitOperations.TrailingZeroCount(_mask);
                     _last = _position + (nint)((uint)offset >> 1);
@@ -321,7 +321,7 @@ internal static class PathHelper
                     return ((int)start, (int)_last);
                 }
 
-                if (_position + Vector256<ushort>.Count <= _length)
+                if (Avx2.IsSupported && _position + Vector256<ushort>.Count <= _length)
                 {
                     var chunk = LoadVector256(ref source, _position);
                     var allowEscapingMask = CreateAllowEscaping256Bitmask(flags);
