@@ -309,14 +309,16 @@ internal static class PathHelper
 
             while (_position < _length)
             {
-                if (Avx2.IsSupported && _mask != 0)
+                if ((Avx2.IsSupported || Sse2.IsSupported) && _mask != 0)
                 {
                     var offset = BitOperations.TrailingZeroCount(_mask);
                     _last = _position + (nint)((uint)offset >> 1);
                     _mask &= ~(3u << offset);
 
                     if (_mask == 0)
-                        _position += Vector256<ushort>.Count;
+                        _position += Avx2.IsSupported
+                            ? Vector256<ushort>.Count
+                            : Vector128<ushort>.Count;
 
                     return ((int)start, (int)_last);
                 }
