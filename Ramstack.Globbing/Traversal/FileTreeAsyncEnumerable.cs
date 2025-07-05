@@ -72,8 +72,8 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
     {
         CancellationTokenSource? source = null;
 
-        if (_cancellationToken != default)
-            cancellationToken = cancellationToken != default
+        if (_cancellationToken != CancellationToken.None)
+            cancellationToken = cancellationToken != CancellationToken.None
                 ? (source = CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken, cancellationToken)).Token
                 : _cancellationToken;
 
