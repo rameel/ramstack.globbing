@@ -755,10 +755,10 @@ public static class DirectoryInfoExtensions
     {
         flags = Files.AdjustMatchFlags(flags);
 
-        return new FileSystemEnumerable<FileInfo>(path, (ref FileSystemEntry entry) => (FileInfo)entry.ToFileSystemInfo(), options)
+        return new FileSystemEnumerable<FileInfo>(path, (ref entry) => (FileInfo)entry.ToFileSystemInfo(), options)
         {
-            ShouldIncludePredicate = (ref FileSystemEntry entry) => Files.ShouldInclude(ref entry, patterns, excludes, flags, target),
-            ShouldRecursePredicate = (ref FileSystemEntry entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
+            ShouldIncludePredicate = (ref entry) => Files.ShouldInclude(ref entry, patterns, excludes, flags, target),
+            ShouldRecursePredicate = (ref entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
         };
     }
 
@@ -766,10 +766,10 @@ public static class DirectoryInfoExtensions
     {
         flags = Files.AdjustMatchFlags(flags);
 
-        return new FileSystemEnumerable<DirectoryInfo>(path, (ref FileSystemEntry entry) => (DirectoryInfo)entry.ToFileSystemInfo(), options)
+        return new FileSystemEnumerable<DirectoryInfo>(path, (ref entry) => (DirectoryInfo)entry.ToFileSystemInfo(), options)
         {
-            ShouldIncludePredicate = (ref FileSystemEntry entry) => Files.ShouldInclude(ref entry, patterns, excludes, flags, target),
-            ShouldRecursePredicate = (ref FileSystemEntry entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
+            ShouldIncludePredicate = (ref entry) => Files.ShouldInclude(ref entry, patterns, excludes, flags, target),
+            ShouldRecursePredicate = (ref entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
         };
     }
 
@@ -777,10 +777,10 @@ public static class DirectoryInfoExtensions
     {
         flags = Files.AdjustMatchFlags(flags);
 
-        return new FileSystemEnumerable<FileSystemInfo>(path, (ref FileSystemEntry entry) => entry.ToFileSystemInfo(), options)
+        return new FileSystemEnumerable<FileSystemInfo>(path, (ref entry) => entry.ToFileSystemInfo(), options)
         {
-            ShouldIncludePredicate = (ref FileSystemEntry entry) => Files.ShouldInclude(ref entry, patterns, excludes, flags, target),
-            ShouldRecursePredicate = (ref FileSystemEntry entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
+            ShouldIncludePredicate = (ref entry) => Files.ShouldInclude(ref entry, patterns, excludes, flags, target),
+            ShouldRecursePredicate = (ref entry) => Files.ShouldRecurse(ref entry, patterns, excludes, flags)
         };
     }
 }
