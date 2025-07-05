@@ -37,3 +37,43 @@ jobs:
 
       - name: Test (Release)
         run: dotnet test -c Release --no-build
+
+      - name: Test (Debug, Avx2=Disabled)
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            $env:COMPlus_EnableAVX2="0"
+          else
+            export COMPlus_EnableAVX2=0
+          fi
+          dotnet test -c Debug --no-build
+
+      - name: Test (Release, Avx2=Disabled)
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            $env:COMPlus_EnableAVX2="0"
+          else
+            export COMPlus_EnableAVX2=0
+          fi
+          dotnet test -c Release --no-build
+
+      - name: Test (Debug, Avx2=Disabled, Sse2=Disabled)
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            $env:COMPlus_EnableAVX2="0"
+            $env:COMPlus_EnableSSE2="0"
+          else
+            export COMPlus_EnableAVX2=0
+            export COMPlus_EnableSSE2=0
+          fi
+          dotnet test -c Debug --no-build
+
+      - name: Test (Release, Avx2=Disabled, Sse2=Disabled)
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            $env:COMPlus_EnableAVX2="0"
+            $env:COMPlus_EnableSSE2="0"
+          else
+            export COMPlus_EnableAVX2=0
+            export COMPlus_EnableSSE2=0
+          fi
+          dotnet test -c Release --no-build
