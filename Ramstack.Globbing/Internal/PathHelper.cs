@@ -338,6 +338,23 @@ internal static class PathHelper
                     if (_mask == 0)
                         _position += Vector256<ushort>.Count;
                 }
+                else if (Sse2.IsSupported && !Avx2.IsSupported && _position + Vector128<ushort>.Count <= _length)
+                {
+                    var chunk = LoadVector128(ref source, _position);
+                    var allowEscapingMask = CreateAllowEscaping128Bitmask(flags);
+                    var slash = Vector128.Create((ushort)'/');
+                    var backslash = Vector128.Create((ushort)'\\');
+
+                    var comparison = Sse2.Or(
+                        Sse2.CompareEqual(chunk, slash),
+                        Sse2.AndNot(
+                            allowEscapingMask,
+                            Sse2.CompareEqual(chunk, backslash)));
+
+                    _mask = (uint)Sse2.MoveMask(comparison.AsByte());
+                    if (_mask == 0)
+                        _position += Vector128<ushort>.Count;
+                }
                 else
                 {
                     for (; _position < _length; _position++)
