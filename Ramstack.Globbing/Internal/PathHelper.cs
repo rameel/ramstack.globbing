@@ -305,18 +305,32 @@ internal static class PathHelper
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (int start, int final) GetNext(ref char source, MatchFlags flags)
         {
+            //
+            // Number of bits per char (ushort) in the MoveMask output
+            //
+            const uint BitsPerChar = 0b11;
+
             var start = _last + 1;
 
             while (_position < _length)
             {
-                if (Avx2.IsSupported && _mask != 0)
+                if ((Avx2.IsSupported || Sse2.IsSupported) && _mask != 0)
                 {
                     var offset = BitOperations.TrailingZeroCount(_mask);
                     _last = _position + (nint)((uint)offset >> 1);
-                    _mask &= ~(3u << offset);
 
+                    //
+                    // Clear the bits for the current separator to process the next position in the mask
+                    //
+                    _mask &= ~(BitsPerChar << offset);
+
+                    //
+                    // Advance position to the next chunk when no separators remain in the mask
+                    //
                     if (_mask == 0)
-                        _position += Vector256<ushort>.Count;
+                        _position += Avx2.IsSupported
+                            ? Vector256<ushort>.Count
+                            : Vector128<ushort>.Count;
 
                     return ((int)start, (int)_last);
                 }
@@ -334,9 +348,46 @@ internal static class PathHelper
                             allowEscapingMask,
                             Avx2.CompareEqual(chunk, backslash)));
 
+                    //
+                    // Store the comparison bitmask and reuse it across iterations
+                    // as long as it contains non-zero bits.
+                    // This avoids reloading SIMD registers and repeating comparisons
+                    // on the same chunk of data.
+                    //
                     _mask = (uint)Avx2.MoveMask(comparison.AsByte());
+
+                    //
+                    // Advance position to the next chunk when no separators found
+                    //
                     if (_mask == 0)
                         _position += Vector256<ushort>.Count;
+                }
+                else if (Sse2.IsSupported && !Avx2.IsSupported && _position + Vector128<ushort>.Count <= _length)
+                {
+                    var chunk = LoadVector128(ref source, _position);
+                    var allowEscapingMask = CreateAllowEscaping128Bitmask(flags);
+                    var slash = Vector128.Create((ushort)'/');
+                    var backslash = Vector128.Create((ushort)'\\');
+
+                    var comparison = Sse2.Or(
+                        Sse2.CompareEqual(chunk, slash),
+                        Sse2.AndNot(
+                            allowEscapingMask,
+                            Sse2.CompareEqual(chunk, backslash)));
+
+                    //
+                    // Store the comparison bitmask and reuse it across iterations
+                    // as long as it contains non-zero bits.
+                    // This avoids reloading SIMD registers and repeating comparisons
+                    // on the same chunk of data.
+                    //
+                    _mask = (uint)Sse2.MoveMask(comparison.AsByte());
+
+                    //
+                    // Advance position to the next chunk when no separators found
+                    //
+                    if (_mask == 0)
+                        _position += Vector128<ushort>.Count;
                 }
                 else
                 {

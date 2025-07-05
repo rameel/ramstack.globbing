@@ -37,3 +37,25 @@ jobs:
 
       - name: Test (Release)
         run: dotnet test -c Release --no-build
+
+      - name: Test (Debug, Avx2=Disabled)
+        env:
+          COMPlus_EnableAVX2: "0"
+        run: dotnet test -c Debug --no-build
+
+      - name: Test (Release, Avx2=Disabled)
+        env:
+          COMPlus_EnableAVX2: "0"
+        run: dotnet test -c Release --no-build
+
+      - name: Test (Debug, Avx2=Disabled, Sse2=Disabled)
+        env:
+          COMPlus_EnableAVX2: "0"
+          COMPlus_EnableSSE2: "0"
+        run: dotnet test -c Debug --no-build
+
+      - name: Test (Release, Avx2=Disabled, Sse2=Disabled)
+        env:
+          COMPlus_EnableAVX2: "0"
+          COMPlus_EnableSSE2: "0"
+        run: dotnet test -c Release --no-build
