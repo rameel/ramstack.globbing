@@ -328,9 +328,24 @@ internal static class PathHelper
                     // Advance position to the next chunk when no separators remain in the mask
                     //
                     if (_mask == 0)
-                        _position += Avx2.IsSupported
+                    {
+                        //
+                        // https://github.com/dotnet/runtime/issues/117416
+                        //
+                        // Precompute the stride size instead of calculating it inline
+                        // to avoid stack spilling. For some unknown reason, the JIT
+                        // fails to optimize properly when this is written inline, like so:
+                        // _position += Avx2.IsSupported
+                        //     ? Vector256<ushort>.Count
+                        //     : Vector128<ushort>.Count;
+                        //
+
+                        var stride = Avx2.IsSupported
                             ? Vector256<ushort>.Count
                             : Vector128<ushort>.Count;
+
+                        _position += stride;
+                    }
 
                     return ((int)start, (int)_last);
                 }
