@@ -1,4 +1,6 @@
 # Ramstack.Globbing
+[![NuGet](https://img.shields.io/nuget/v/Ramstack.Globbing.svg)](https://nuget.org/packages/Ramstack.Globbing)
+[![MIT](https://img.shields.io/github/license/rameel/ramstack.globbing)](https://github.com/rameel/ramstack.globbing/blob/main/LICENSE)
 
 Fast and zero-allocation .NET globbing library for matching file paths using [glob patterns](https://en.wikipedia.org/wiki/Glob_(programming)).
 No external dependencies.
@@ -215,9 +217,9 @@ await foreach (string filePath in enumeration)
 
 ## Supported versions
 
-|      | Version |
-|------|---------|
-| .NET | 6, 7, 8 |
+|      | Version    |
+|------|------------|
+| .NET | 6, 7, 8, 9 |
 
 ## Contributions
 
