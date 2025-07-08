@@ -15,6 +15,11 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
     private readonly TEntry _directory;
 
     /// <summary>
+    /// The default capacity of the character buffer for paths rented from the shared array pool.
+    /// </summary>
+    internal const int DefaultBufferCapacity = 512;
+
+    /// <summary>
     /// Gets or sets the glob patterns to include in the enumeration.
     /// </summary>
     public required string[] Patterns { get; init; }
@@ -72,7 +77,7 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
 
     private IEnumerable<TResult> Enumerate()
     {
-        var chars = ArrayPool<char>.Shared.Rent(512);
+        var chars = ArrayPool<char>.Shared.Rent(DefaultBufferCapacity);
 
         var queue = new Queue<(TEntry Directory, string Path)>();
         queue.Enqueue((_directory, ""));
