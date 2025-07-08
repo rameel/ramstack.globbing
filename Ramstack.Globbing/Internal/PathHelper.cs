@@ -197,24 +197,11 @@ internal static class PathHelper
     /// </returns>
     private static Vector256<ushort> CreateAllowEscaping256Bitmask(MatchFlags flags)
     {
-        // Here is a small trick to avoid branching.
-        // To reduce the number of required instructions, we convert the value `Windows`,
-        // which equals 2, into a bitmask that allows escaping characters.
-        // Windows (2) (No character escaping):
-        //                0000 0010 >> 1        = 0000 0001
-        //                0000 0001 & 0000 0001 = 0000 0001
-        //                0000 0001 - 1         = 0000 0000
-        // Any other value will simply convert to 0.
-        // Unix    (4) (Allow escaping characters)
-        //                0000 0100 >> 1        = 0000 0010
-        //                0000 0010 & 0000 0001 = 0000 0000
-        //                0000 0000 - 1         = 1111 1111
-        // Next, during the check, we can simply use the Avx2.AndNot instruction instead of Avx2.And:
-        //    Avx2.AndNot(
-        //        allowEscaping,
-        //        Avx2.CompareEqual(chunk, backslash)))
-        Debug.Assert(MatchFlags.Windows == (MatchFlags)2);
-        return Vector256.Create(((uint)flags >> 1 & 1) - 1).AsUInt16();
+        var mask = Vector256<ushort>.Zero;
+        if (flags != MatchFlags.Windows)
+            mask = Vector256<ushort>.AllBitsSet;
+
+        return mask;
     }
 
     /// <summary>
@@ -226,8 +213,11 @@ internal static class PathHelper
     /// </returns>
     private static Vector128<ushort> CreateAllowEscaping128Bitmask(MatchFlags flags)
     {
-        Debug.Assert(MatchFlags.Windows == (MatchFlags)2);
-        return Vector128.Create(((uint)flags >> 1 & 1) - 1).AsUInt16();
+        var mask = Vector128<ushort>.Zero;
+        if (flags != MatchFlags.Windows)
+            mask = Vector128<ushort>.AllBitsSet;
+
+        return mask;
     }
 
     /// <summary>
