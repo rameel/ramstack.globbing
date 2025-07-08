@@ -84,10 +84,10 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
 
     private async IAsyncEnumerable<TResult> EnumerateAsync(CancellationTokenSource? source, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var chars = ArrayPool<char>.Shared.Rent(512);
-
         try
         {
+            var chars = ArrayPool<char>.Shared.Rent(FileTreeEnumerable<TEntry, TResult>.DefaultBufferCapacity);
+
             var queue = new Queue<(TEntry Directory, string Path)>();
             queue.Enqueue((_directory, ""));
 
@@ -110,10 +110,11 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
                             yield return ResultSelector(entry);
                 }
             }
+
+            ArrayPool<char>.Shared.Return(chars);
         }
         finally
         {
-            ArrayPool<char>.Shared.Return(chars);
             source?.Dispose();
         }
     }

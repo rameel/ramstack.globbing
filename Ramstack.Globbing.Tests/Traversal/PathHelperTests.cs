@@ -21,6 +21,7 @@ public partial class PathHelperTests
     [TestCase("directory_1/directory_2", 2)]
     [TestCase("directory_1/directory_2/", 2)]
     [TestCase("///directory_1/directory_2////", 2)]
+    [TestCase("/1/2/3/4/5/6/project/src/tests", 9)]
     public void CountPathSegments(string path, int expected)
     {
         Assert.That(

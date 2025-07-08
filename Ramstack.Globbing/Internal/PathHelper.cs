@@ -66,16 +66,18 @@ internal static class PathHelper
     public static int CountPathSegments(scoped ReadOnlySpan<char> path, MatchFlags flags)
     {
         var count = 0;
+        var iterator = new PathSegmentIterator();
         ref var s = ref Unsafe.AsRef(in MemoryMarshal.GetReference(path));
-        var iterator = new PathSegmentIterator(path.Length);
+        var length = path.Length;
 
         while (true)
         {
-            var r = iterator.GetNext(ref s, flags);
+            var r = iterator.GetNext(ref s, length, flags);
+
             if (r.start != r.final)
                 count++;
 
-            if (r.final == path.Length)
+            if (r.final == length)
                 break;
         }
 
@@ -101,17 +103,18 @@ internal static class PathHelper
         if (depth < 1)
             depth = 1;
 
+        var iterator = new PathSegmentIterator();
         ref var s = ref Unsafe.AsRef(in pattern.GetPinnableReference());
-        var iterator = new PathSegmentIterator(pattern.Length);
+        var length = pattern.Length;
 
         while (true)
         {
-            var r = iterator.GetNext(ref s, flags);
+            var r = iterator.GetNext(ref s, length, flags);
             if (r.start != r.final)
                 depth--;
 
             if (depth < 1
-                || r.final == pattern.Length
+                || r.final == length
                 || IsGlobStar(ref s, r.start, r.final))
                 return MemoryMarshal.CreateReadOnlySpan(ref s, r.final);
         }
@@ -197,24 +200,11 @@ internal static class PathHelper
     /// </returns>
     private static Vector256<ushort> CreateAllowEscaping256Bitmask(MatchFlags flags)
     {
-        // Here is a small trick to avoid branching.
-        // To reduce the number of required instructions, we convert the value `Windows`,
-        // which equals 2, into a bitmask that allows escaping characters.
-        // Windows (2) (No character escaping):
-        //                0000 0010 >> 1        = 0000 0001
-        //                0000 0001 & 0000 0001 = 0000 0001
-        //                0000 0001 - 1         = 0000 0000
-        // Any other value will simply convert to 0.
-        // Unix    (4) (Allow escaping characters)
-        //                0000 0100 >> 1        = 0000 0010
-        //                0000 0010 & 0000 0001 = 0000 0000
-        //                0000 0000 - 1         = 1111 1111
-        // Next, during the check, we can simply use the Avx2.AndNot instruction instead of Avx2.And:
-        //    Avx2.AndNot(
-        //        allowEscaping,
-        //        Avx2.CompareEqual(chunk, backslash)))
-        Debug.Assert(MatchFlags.Windows == (MatchFlags)2);
-        return Vector256.Create(((uint)flags >> 1 & 1) - 1).AsUInt16();
+        var mask = Vector256<ushort>.Zero;
+        if (flags != MatchFlags.Windows)
+            mask = Vector256<ushort>.AllBitsSet;
+
+        return mask;
     }
 
     /// <summary>
@@ -226,8 +216,11 @@ internal static class PathHelper
     /// </returns>
     private static Vector128<ushort> CreateAllowEscaping128Bitmask(MatchFlags flags)
     {
-        Debug.Assert(MatchFlags.Windows == (MatchFlags)2);
-        return Vector128.Create(((uint)flags >> 1 & 1) - 1).AsUInt16();
+        var mask = Vector128<ushort>.Zero;
+        if (flags != MatchFlags.Windows)
+            mask = Vector128<ushort>.AllBitsSet;
+
+        return mask;
     }
 
     /// <summary>
@@ -278,23 +271,22 @@ internal static class PathHelper
     /// </summary>
     private struct PathSegmentIterator
     {
-        private nint _last;
+        private int _last;
         private nint _position;
         private uint _mask;
-        private readonly nint _length;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PathSegmentIterator"/> structure.
         /// </summary>
-        /// <param name="length">The path length.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public PathSegmentIterator(int length) =>
-            (_last, _length) = (-1, (nint)(uint)length);
+        public PathSegmentIterator() =>
+            _last = -1;
 
         /// <summary>
         /// Retrieves the next segment of the path.
         /// </summary>
         /// <param name="source">A reference to the starting character of the path.</param>
+        /// <param name="length">The total number of characters in the input path starting from <paramref name="source"/>.</param>
         /// <param name="flags">The flags indicating the type of path separators to match.</param>
         /// <returns>
         /// A tuple containing the start and end indices of the next path segment.
@@ -303,39 +295,49 @@ internal static class PathHelper
         /// The end of the iteration is indicated by <c>final</c> being equal to the length of the path.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public (int start, int final) GetNext(ref char source, MatchFlags flags)
+        public (int start, int final) GetNext(ref char source, int length, MatchFlags flags)
         {
-            //
-            // Number of bits per char (ushort) in the MoveMask output
-            //
-            const uint BitsPerChar = 0b11;
-
             var start = _last + 1;
 
-            while (_position < _length)
+            while ((int)_position < length)
             {
                 if ((Avx2.IsSupported || Sse2.IsSupported) && _mask != 0)
                 {
                     var offset = BitOperations.TrailingZeroCount(_mask);
-                    _last = _position + (nint)((uint)offset >> 1);
+                    _last = (int)(_position + (nint)((uint)offset >> 1));
 
                     //
                     // Clear the bits for the current separator to process the next position in the mask
                     //
-                    _mask &= ~(BitsPerChar << offset);
+                    _mask &= ~(0b_11u << offset);
 
                     //
                     // Advance position to the next chunk when no separators remain in the mask
                     //
                     if (_mask == 0)
-                        _position += Avx2.IsSupported
+                    {
+                        //
+                        // https://github.com/dotnet/runtime/issues/117416
+                        //
+                        // Precompute the stride size instead of calculating it inline
+                        // to avoid stack spilling. For some unknown reason, the JIT
+                        // fails to optimize properly when this is written inline, like so:
+                        // _position += Avx2.IsSupported
+                        //     ? Vector256<ushort>.Count
+                        //     : Vector128<ushort>.Count;
+                        //
+
+                        var stride = Avx2.IsSupported
                             ? Vector256<ushort>.Count
                             : Vector128<ushort>.Count;
 
-                    return ((int)start, (int)_last);
+                        _position += stride;
+                    }
+
+                    return (start, _last);
                 }
 
-                if (Avx2.IsSupported && _position + Vector256<ushort>.Count <= _length)
+                if (Avx2.IsSupported && (int)_position + Vector256<ushort>.Count <= length)
                 {
                     var chunk = LoadVector256(ref source, _position);
                     var allowEscapingMask = CreateAllowEscaping256Bitmask(flags);
@@ -362,7 +364,7 @@ internal static class PathHelper
                     if (_mask == 0)
                         _position += Vector256<ushort>.Count;
                 }
-                else if (Sse2.IsSupported && !Avx2.IsSupported && _position + Vector128<ushort>.Count <= _length)
+                else if (Sse2.IsSupported && !Avx2.IsSupported && (int)_position + Vector128<ushort>.Count <= length)
                 {
                     var chunk = LoadVector128(ref source, _position);
                     var allowEscapingMask = CreateAllowEscaping128Bitmask(flags);
@@ -391,20 +393,21 @@ internal static class PathHelper
                 }
                 else
                 {
-                    for (; _position < _length; _position++)
+                    for (; (int)_position < length; _position++)
                     {
                         var ch = Unsafe.Add(ref source, _position);
                         if (ch == '/' || (ch == '\\' && flags == MatchFlags.Windows))
                         {
-                            _last = _position;
+                            _last = (int)_position;
                             _position++;
-                            return ((int)start, (int)_last);
+
+                            return (start, _last);
                         }
                     }
                 }
             }
 
-            return ((int)start, (int)_length);
+            return (start, length);
         }
     }
 
