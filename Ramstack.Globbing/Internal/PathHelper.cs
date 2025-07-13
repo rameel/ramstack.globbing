@@ -198,10 +198,10 @@ internal static class PathHelper
     /// <returns>
     /// A 256-bit bitmask for escaping characters.
     /// </returns>
-    private static Vector256<ushort> CreateAllowEscaping256Bitmask(MatchFlags flags)
+    private static Vector256<ushort> CreateBackslash256Bitmask(MatchFlags flags)
     {
         var mask = Vector256<ushort>.Zero;
-        if (flags != MatchFlags.Windows)
+        if (flags == MatchFlags.Windows)
             mask = Vector256<ushort>.AllBitsSet;
 
         return mask;
@@ -214,10 +214,10 @@ internal static class PathHelper
     /// <returns>
     /// A 128-bit bitmask for escaping characters.
     /// </returns>
-    private static Vector128<ushort> CreateAllowEscaping128Bitmask(MatchFlags flags)
+    private static Vector128<ushort> CreateBackslash128Bitmask(MatchFlags flags)
     {
         var mask = Vector128<ushort>.Zero;
-        if (flags != MatchFlags.Windows)
+        if (flags == MatchFlags.Windows)
             mask = Vector128<ushort>.AllBitsSet;
 
         return mask;
@@ -340,14 +340,14 @@ internal static class PathHelper
                 if (Avx2.IsSupported && (int)_position + Vector256<ushort>.Count <= length)
                 {
                     var chunk = LoadVector256(ref source, _position);
-                    var allowEscapingMask = CreateAllowEscaping256Bitmask(flags);
+                    var backslashMask = CreateBackslash256Bitmask(flags);
                     var slash = Vector256.Create((ushort)'/');
                     var backslash = Vector256.Create((ushort)'\\');
 
                     var comparison = Avx2.Or(
                         Avx2.CompareEqual(chunk, slash),
-                        Avx2.AndNot(
-                            allowEscapingMask,
+                        Avx2.And(
+                            backslashMask,
                             Avx2.CompareEqual(chunk, backslash)));
 
                     //
@@ -367,14 +367,14 @@ internal static class PathHelper
                 else if (Sse2.IsSupported && !Avx2.IsSupported && (int)_position + Vector128<ushort>.Count <= length)
                 {
                     var chunk = LoadVector128(ref source, _position);
-                    var allowEscapingMask = CreateAllowEscaping128Bitmask(flags);
+                    var backslashMask = CreateBackslash128Bitmask(flags);
                     var slash = Vector128.Create((ushort)'/');
                     var backslash = Vector128.Create((ushort)'\\');
 
                     var comparison = Sse2.Or(
                         Sse2.CompareEqual(chunk, slash),
-                        Sse2.AndNot(
-                            allowEscapingMask,
+                        Sse2.And(
+                            backslashMask,
                             Sse2.CompareEqual(chunk, backslash)));
 
                     //
