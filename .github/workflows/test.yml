@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest]
 
     steps:
       - name: Setup .NET
@@ -38,24 +38,28 @@ jobs:
       - name: Test (Release)
         run: dotnet test -c Release --no-build
 
-      - name: Test (Debug, Avx2=Disabled)
+      - name: Test (Debug, Avx2=0)
         env:
           COMPlus_EnableAVX2: "0"
         run: dotnet test -c Debug --no-build
 
-      - name: Test (Release, Avx2=Disabled)
+      - name: Test (Release, Avx2=0)
         env:
           COMPlus_EnableAVX2: "0"
         run: dotnet test -c Release --no-build
 
-      - name: Test (Debug, Avx2=Disabled, Sse2=Disabled)
+      - name: Test (Debug, Sse2=0, Sse41=0, Avx2=0, AdvSimd=0)
         env:
-          COMPlus_EnableAVX2: "0"
           COMPlus_EnableSSE2: "0"
+          COMPlus_EnableSSE41: "0"
+          COMPlus_EnableAVX2: "0"
+          COMPlus_EnableAdvSimd: "0"
         run: dotnet test -c Debug --no-build
 
-      - name: Test (Release, Avx2=Disabled, Sse2=Disabled)
+      - name: Test (Release, Sse2=0, Sse41=0, Avx2=0, AdvSimd=0)
         env:
-          COMPlus_EnableAVX2: "0"
           COMPlus_EnableSSE2: "0"
+          COMPlus_EnableSSE41: "0"
+          COMPlus_EnableAVX2: "0"
+          COMPlus_EnableAdvSimd: "0"
         run: dotnet test -c Release --no-build
