@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
 
 namespace Ramstack.Globbing;
@@ -8,10 +10,19 @@ public class SimdConfigurationTests
     [Test]
     public void VerifySimdConfiguration()
     {
-        var isAvx2Disabled = Environment.GetEnvironmentVariable("COMPlus_EnableAVX2") == "0";
-        var isSse2Disabled = Environment.GetEnvironmentVariable("COMPlus_EnableSSE2") == "0";
+        if (Environment.GetEnvironmentVariable("DOTNET_EnableHWIntrinsic") == "0")
+        {
+            Assert.That(Sse2.IsSupported, Is.False);
+            Assert.That(Sse41.IsSupported, Is.False);
+            Assert.That(Avx2.IsSupported, Is.False);
+            Assert.That(AdvSimd.IsSupported, Is.False);
+        }
 
-        Assert.That(isAvx2Disabled, Is.EqualTo(!Avx2.IsSupported));
-        Assert.That(isSse2Disabled, Is.EqualTo(!Sse2.IsSupported));
+        if (RuntimeInformation.ProcessArchitecture == Architecture.X64 && Environment.GetEnvironmentVariable("DOTNET_EnableAVX2") == "0")
+        {
+            Assert.That(Sse2.IsSupported, Is.True);
+            Assert.That(Sse41.IsSupported, Is.True);
+            Assert.That(Avx2.IsSupported, Is.False);
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
 
 namespace Ramstack.Globbing.Internal;
@@ -172,12 +173,44 @@ internal static class PathHelper
                 }
                 while (i < tail);
 
+                //
                 // Process remaining chars
                 // NOTE: An extra one write for the 'length == Vector128<ushort>.Count'
+                //
 
                 value = LoadVector128(ref p, tail);
                 mask = Sse2.CompareEqual(value, backslash);
                 result = Sse41.BlendVariable(value, slash, mask);
+                WriteVector128(ref p, tail, result);
+            }
+            else if (AdvSimd.IsSupported && length >= Vector128<ushort>.Count)
+            {
+                Vector128<ushort> value;
+                Vector128<ushort> mask;
+                Vector128<ushort> result;
+
+                var slash = Vector128.Create((ushort)'/');
+                var backslash = Vector128.Create((ushort)'\\');
+                var tail = length - Vector128<ushort>.Count;
+
+                do
+                {
+                    value = LoadVector128(ref p, i);
+                    mask = AdvSimd.CompareEqual(value, backslash);
+                    result = AdvSimd.BitwiseSelect(mask, slash, value);
+                    WriteVector128(ref p, i, result);
+
+                    i += Vector128<ushort>.Count;
+                }
+                while (i < tail);
+
+                //
+                // Process remaining chars
+                // NOTE: An extra one write for the 'length == Vector128<ushort>.Count'
+                //
+                value = LoadVector128(ref p, tail);
+                mask = AdvSimd.CompareEqual(value, backslash);
+                result = AdvSimd.BitwiseSelect(mask, slash, value);
                 WriteVector128(ref p, tail, result);
             }
             else
@@ -198,10 +231,10 @@ internal static class PathHelper
     /// <returns>
     /// A 256-bit bitmask for escaping characters.
     /// </returns>
-    private static Vector256<ushort> CreateAllowEscaping256Bitmask(MatchFlags flags)
+    private static Vector256<ushort> CreateBackslash256Bitmask(MatchFlags flags)
     {
         var mask = Vector256<ushort>.Zero;
-        if (flags != MatchFlags.Windows)
+        if (flags == MatchFlags.Windows)
             mask = Vector256<ushort>.AllBitsSet;
 
         return mask;
@@ -214,10 +247,10 @@ internal static class PathHelper
     /// <returns>
     /// A 128-bit bitmask for escaping characters.
     /// </returns>
-    private static Vector128<ushort> CreateAllowEscaping128Bitmask(MatchFlags flags)
+    private static Vector128<ushort> CreateBackslash128Bitmask(MatchFlags flags)
     {
         var mask = Vector128<ushort>.Zero;
-        if (flags != MatchFlags.Windows)
+        if (flags == MatchFlags.Windows)
             mask = Vector128<ushort>.AllBitsSet;
 
         return mask;
@@ -301,15 +334,37 @@ internal static class PathHelper
 
             while ((int)_position < length)
             {
-                if ((Avx2.IsSupported || Sse2.IsSupported) && _mask != 0)
+                if ((Avx2.IsSupported || Sse2.IsSupported || AdvSimd.IsSupported) && _mask != 0)
                 {
                     var offset = BitOperations.TrailingZeroCount(_mask);
-                    _last = (int)(_position + (nint)((uint)offset >> 1));
+                    if (AdvSimd.IsSupported)
+                    {
+                        //
+                        // On ARM, ExtractMostSignificantBits returns a mask where each bit
+                        // represents one vector element (1 bit per ushort), so offset
+                        // directly corresponds to the element index
+                        //
+                        _last = (int)(_position + (nint)(uint)offset);
 
-                    //
-                    // Clear the bits for the current separator to process the next position in the mask
-                    //
-                    _mask &= ~(0b_11u << offset);
+                        //
+                        // Clear the bits for the current separator
+                        //
+                        _mask &= ~(1u << offset);
+                    }
+                    else
+                    {
+                        //
+                        // On x86, MoveMask (and ExtractMostSignificantBits on byte-based vectors)
+                        // returns a mask where each bit represents one byte (2 bits per ushort),
+                        // so we need to divide offset by 2 to get the actual element index
+                        //
+                        _last = (int)(_position + (nint)((uint)offset >> 1));
+
+                        //
+                        // Clear the bits for the current separator
+                        //
+                        _mask &= ~(0b_11u << offset);
+                    }
 
                     //
                     // Advance position to the next chunk when no separators remain in the mask
@@ -340,14 +395,14 @@ internal static class PathHelper
                 if (Avx2.IsSupported && (int)_position + Vector256<ushort>.Count <= length)
                 {
                     var chunk = LoadVector256(ref source, _position);
-                    var allowEscapingMask = CreateAllowEscaping256Bitmask(flags);
+                    var backslashMask = CreateBackslash256Bitmask(flags);
                     var slash = Vector256.Create((ushort)'/');
                     var backslash = Vector256.Create((ushort)'\\');
 
                     var comparison = Avx2.Or(
                         Avx2.CompareEqual(chunk, slash),
-                        Avx2.AndNot(
-                            allowEscapingMask,
+                        Avx2.And(
+                            backslashMask,
                             Avx2.CompareEqual(chunk, backslash)));
 
                     //
@@ -367,14 +422,14 @@ internal static class PathHelper
                 else if (Sse2.IsSupported && !Avx2.IsSupported && (int)_position + Vector128<ushort>.Count <= length)
                 {
                     var chunk = LoadVector128(ref source, _position);
-                    var allowEscapingMask = CreateAllowEscaping128Bitmask(flags);
+                    var backslashMask = CreateBackslash128Bitmask(flags);
                     var slash = Vector128.Create((ushort)'/');
                     var backslash = Vector128.Create((ushort)'\\');
 
                     var comparison = Sse2.Or(
                         Sse2.CompareEqual(chunk, slash),
-                        Sse2.AndNot(
-                            allowEscapingMask,
+                        Sse2.And(
+                            backslashMask,
                             Sse2.CompareEqual(chunk, backslash)));
 
                     //
@@ -391,6 +446,35 @@ internal static class PathHelper
                     if (_mask == 0)
                         _position += Vector128<ushort>.Count;
                 }
+                #if NET7_0_OR_GREATER
+                else if (AdvSimd.IsSupported && (int)_position + Vector128<ushort>.Count <= length)
+                {
+                    var chunk = LoadVector128(ref source, _position);
+                    var backslashMask = CreateBackslash128Bitmask(flags);
+                    var slash = Vector128.Create((ushort)'/');
+                    var backslash = Vector128.Create((ushort)'\\');
+
+                    var comparison = AdvSimd.Or(
+                        AdvSimd.CompareEqual(chunk, slash),
+                        AdvSimd.And(
+                            backslashMask,
+                            AdvSimd.CompareEqual(chunk, backslash)));
+
+                    //
+                    // Store the comparison bitmask and reuse it across iterations
+                    // as long as it contains non-zero bits.
+                    // This avoids reloading SIMD registers and repeating comparisons
+                    // on the same chunk of data.
+                    //
+                    _mask = comparison.ExtractMostSignificantBits();
+
+                    //
+                    // Advance position to the next chunk when no separators found
+                    //
+                    if (_mask == 0)
+                        _position += Vector128<ushort>.Count;
+                }
+                #endif
                 else
                 {
                     for (; (int)_position < length; _position++)
