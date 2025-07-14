@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
@@ -424,35 +425,35 @@ internal static class PathHelper
                     if (_mask == 0)
                         _position += Vector128<ushort>.Count;
                 }
-                // #if NET7_0_OR_GREATER
-                // else if (AdvSimd.IsSupported && (int)_position + Vector128<ushort>.Count <= length)
-                // {
-                //     var chunk = LoadVector128(ref source, _position);
-                //     var backslashMask = CreateBackslash128Bitmask(flags);
-                //     var slash = Vector128.Create((ushort)'/');
-                //     var backslash = Vector128.Create((ushort)'\\');
-                //
-                //     var comparison = AdvSimd.Or(
-                //         AdvSimd.CompareEqual(chunk, slash),
-                //         AdvSimd.And(
-                //             backslashMask,
-                //             AdvSimd.CompareEqual(chunk, backslash)));
-                //
-                //     //
-                //     // Store the comparison bitmask and reuse it across iterations
-                //     // as long as it contains non-zero bits.
-                //     // This avoids reloading SIMD registers and repeating comparisons
-                //     // on the same chunk of data.
-                //     //
-                //     _mask = comparison.ExtractMostSignificantBits();
-                //
-                //     //
-                //     // Advance position to the next chunk when no separators found
-                //     //
-                //     if (_mask == 0)
-                //         _position += Vector128<ushort>.Count;
-                // }
-                // #endif
+                #if NET7_0_OR_GREATER
+                else if (AdvSimd.IsSupported && (int)_position + Vector128<ushort>.Count <= length)
+                {
+                    var chunk = LoadVector128(ref source, _position);
+                    var backslashMask = CreateBackslash128Bitmask(flags);
+                    var slash = Vector128.Create((ushort)'/');
+                    var backslash = Vector128.Create((ushort)'\\');
+
+                    var comparison = AdvSimd.Or(
+                        AdvSimd.CompareEqual(chunk, slash),
+                        AdvSimd.And(
+                            backslashMask,
+                            AdvSimd.CompareEqual(chunk, backslash)));
+
+                    //
+                    // Store the comparison bitmask and reuse it across iterations
+                    // as long as it contains non-zero bits.
+                    // This avoids reloading SIMD registers and repeating comparisons
+                    // on the same chunk of data.
+                    //
+                    _mask = BinaryPrimitives.ReverseEndianness(comparison.ExtractMostSignificantBits());
+
+                    //
+                    // Advance position to the next chunk when no separators found
+                    //
+                    if (_mask == 0)
+                        _position += Vector128<ushort>.Count;
+                }
+                #endif
                 else
                 {
                     for (; (int)_position < length; _position++)
