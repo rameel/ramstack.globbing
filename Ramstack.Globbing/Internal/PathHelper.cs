@@ -339,17 +339,29 @@ internal static class PathHelper
                     var offset = BitOperations.TrailingZeroCount(_mask);
                     if (AdvSimd.IsSupported)
                     {
-                        _last = (int)(_position + (nint)(uint)offset);
                         //
-                        // Clear the bits for the current separator to process the next position in the mask
+                        // On ARM, ExtractMostSignificantBits returns a mask where each bit
+                        // represents one vector element (1 bit per ushort), so offset
+                        // directly corresponds to the element index
+                        //
+                        _last = (int)(_position + (nint)(uint)offset);
+
+                        //
+                        // Clear the bits for the current separator
                         //
                         _mask &= ~(1u << offset);
                     }
                     else
                     {
-                        _last = (int)(_position + (nint)((uint)offset >> 1));
                         //
-                        // Clear the bits for the current separator to process the next position in the mask
+                        // On x86, MoveMask (and ExtractMostSignificantBits on byte-based vectors)
+                        // returns a mask where each bit represents one byte (2 bits per ushort),
+                        // so we need to divide offset by 2 to get the actual element index
+                        //
+                        _last = (int)(_position + (nint)((uint)offset >> 1));
+
+                        //
+                        // Clear the bits for the current separator
                         //
                         _mask &= ~(0b_11u << offset);
                     }
