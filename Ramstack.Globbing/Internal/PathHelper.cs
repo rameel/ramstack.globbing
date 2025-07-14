@@ -1,4 +1,3 @@
-using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
@@ -445,7 +444,7 @@ internal static class PathHelper
                     // This avoids reloading SIMD registers and repeating comparisons
                     // on the same chunk of data.
                     //
-                    _mask = BinaryPrimitives.ReverseEndianness(comparison.ExtractMostSignificantBits());
+                    _mask = comparison.ExtractMostSignificantBits();
 
                     //
                     // Advance position to the next chunk when no separators found
