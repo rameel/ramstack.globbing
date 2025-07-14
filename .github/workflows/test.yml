@@ -33,7 +33,9 @@ jobs:
         run: dotnet build -c Release
 
       - name: Test (Debug)
-        run: dotnet test -c Debug --no-build
+        run: |
+          dotnet test -c Debug --no-build
+          echo "Tests completed"
 
       - name: Test (Release)
         run: dotnet test -c Release --no-build
