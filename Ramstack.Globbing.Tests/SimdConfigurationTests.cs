@@ -15,6 +15,7 @@ public class SimdConfigurationTests
             Assert.That(Sse2.IsSupported, Is.False);
             Assert.That(Sse41.IsSupported, Is.False);
             Assert.That(Avx2.IsSupported, Is.False);
+            Assert.That(AdvSimd.Arm64.IsSupported, Is.False);
             Assert.That(AdvSimd.IsSupported, Is.False);
         }
 
