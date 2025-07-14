@@ -337,12 +337,22 @@ internal static class PathHelper
                 if ((Avx2.IsSupported || Sse2.IsSupported || AdvSimd.IsSupported) && _mask != 0)
                 {
                     var offset = BitOperations.TrailingZeroCount(_mask);
-                    _last = (int)(_position + (nint)((uint)offset >> 1));
-
-                    //
-                    // Clear the bits for the current separator to process the next position in the mask
-                    //
-                    _mask &= ~(0b_11u << offset);
+                    if (AdvSimd.IsSupported)
+                    {
+                        _last = (int)(_position + (nint)(uint)offset);
+                        //
+                        // Clear the bits for the current separator to process the next position in the mask
+                        //
+                        _mask &= ~(1u << offset);
+                    }
+                    else
+                    {
+                        _last = (int)(_position + (nint)((uint)offset >> 1));
+                        //
+                        // Clear the bits for the current separator to process the next position in the mask
+                        //
+                        _mask &= ~(0b_11u << offset);
+                    }
 
                     //
                     // Advance position to the next chunk when no separators remain in the mask
