@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-// using System.Runtime.Intrinsics.Arm;
+using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
 
 namespace Ramstack.Globbing;
@@ -22,11 +22,11 @@ public class SimdConfigurationTests
                 Assert.That(isAvx2Disabled, Is.EqualTo(!Avx2.IsSupported));
                 break;
 
-            // case Architecture.Arm64:
-            //     var isAdvSimdDisabled = Environment.GetEnvironmentVariable("COMPlus_EnableAdvSimd") == "0";
-            //
-            //     Assert.That(isAdvSimdDisabled, Is.EqualTo(!AdvSimd.IsSupported));
-            //     break;
+            case Architecture.Arm64:
+                var isAdvSimdDisabled = Environment.GetEnvironmentVariable("COMPlus_EnableAdvSimd") == "0";
+
+                Assert.That(isAdvSimdDisabled, Is.EqualTo(!AdvSimd.IsSupported));
+                break;
         }
     }
 }

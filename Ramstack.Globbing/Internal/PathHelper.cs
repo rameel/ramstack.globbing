@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
-// using System.Runtime.Intrinsics.Arm;
+using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
 
 namespace Ramstack.Globbing.Internal;
@@ -183,36 +183,36 @@ internal static class PathHelper
                 result = Sse41.BlendVariable(value, slash, mask);
                 WriteVector128(ref p, tail, result);
             }
-            // else if (AdvSimd.IsSupported && length >= Vector128<ushort>.Count)
-            // {
-            //     Vector128<ushort> value;
-            //     Vector128<ushort> mask;
-            //     Vector128<ushort> result;
-            //
-            //     var slash = Vector128.Create((ushort)'/');
-            //     var backslash = Vector128.Create((ushort)'\\');
-            //     var tail = length - Vector128<ushort>.Count;
-            //
-            //     do
-            //     {
-            //         value = LoadVector128(ref p, i);
-            //         mask = AdvSimd.CompareEqual(value, backslash);
-            //         result = AdvSimd.BitwiseSelect(mask, slash, value);
-            //         WriteVector128(ref p, i, result);
-            //
-            //         i += Vector128<ushort>.Count;
-            //     }
-            //     while (i < tail);
-            //
-            //     //
-            //     // Process remaining chars
-            //     // NOTE: An extra one write for the 'length == Vector128<ushort>.Count'
-            //     //
-            //     value = LoadVector128(ref p, tail);
-            //     mask = AdvSimd.CompareEqual(value, backslash);
-            //     result = AdvSimd.BitwiseSelect(mask, slash, value);
-            //     WriteVector128(ref p, tail, result);
-            // }
+            else if (AdvSimd.IsSupported && length >= Vector128<ushort>.Count)
+            {
+                Vector128<ushort> value;
+                Vector128<ushort> mask;
+                Vector128<ushort> result;
+
+                var slash = Vector128.Create((ushort)'/');
+                var backslash = Vector128.Create((ushort)'\\');
+                var tail = length - Vector128<ushort>.Count;
+
+                do
+                {
+                    value = LoadVector128(ref p, i);
+                    mask = AdvSimd.CompareEqual(value, backslash);
+                    result = AdvSimd.BitwiseSelect(mask, slash, value);
+                    WriteVector128(ref p, i, result);
+
+                    i += Vector128<ushort>.Count;
+                }
+                while (i < tail);
+
+                //
+                // Process remaining chars
+                // NOTE: An extra one write for the 'length == Vector128<ushort>.Count'
+                //
+                value = LoadVector128(ref p, tail);
+                mask = AdvSimd.CompareEqual(value, backslash);
+                result = AdvSimd.BitwiseSelect(mask, slash, value);
+                WriteVector128(ref p, tail, result);
+            }
             else
             {
                 for (; i < length; i++)
