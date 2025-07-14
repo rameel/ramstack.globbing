@@ -25,6 +25,9 @@ public class SimdConfigurationTests
             case Architecture.Arm64:
                 var isAdvSimdDisabled = Environment.GetEnvironmentVariable("DOTNET_EnableAdvSimd") == "0";
 
+                Console.WriteLine($"DOTNET_EnableAdvSimd: {isAdvSimdDisabled}");
+                Console.WriteLine($"AdvSimd.IsSupported : {AdvSimd.IsSupported}");
+
                 Assert.That(isAdvSimdDisabled, Is.EqualTo(!AdvSimd.IsSupported));
                 break;
         }
