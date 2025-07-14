@@ -10,26 +10,19 @@ public class SimdConfigurationTests
     [Test]
     public void VerifySimdConfiguration()
     {
-        switch (RuntimeInformation.ProcessArchitecture)
+        if (Environment.GetEnvironmentVariable("DOTNET_EnableHWIntrinsic") == "0")
         {
-            case Architecture.X64:
-                var isSse2Disabled = Environment.GetEnvironmentVariable("DOTNET_EnableSSE2") == "0";
-                var isSse41Disabled = Environment.GetEnvironmentVariable("DOTNET_EnableSSE41") == "0";
-                var isAvx2Disabled = Environment.GetEnvironmentVariable("DOTNET_EnableAVX2") == "0";
+            Assert.That(Sse2.IsSupported, Is.False);
+            Assert.That(Sse41.IsSupported, Is.False);
+            Assert.That(Avx2.IsSupported, Is.False);
+            Assert.That(AdvSimd.IsSupported, Is.False);
+        }
 
-                Assert.That(isSse2Disabled, Is.EqualTo(!Sse2.IsSupported));
-                Assert.That(isSse41Disabled, Is.EqualTo(!Sse41.IsSupported));
-                Assert.That(isAvx2Disabled, Is.EqualTo(!Avx2.IsSupported));
-                break;
-
-            case Architecture.Arm64:
-                var isAdvSimdDisabled = Environment.GetEnvironmentVariable("DOTNET_EnableAdvSimd") == "0";
-
-                Console.WriteLine($"DOTNET_EnableAdvSimd: {isAdvSimdDisabled}");
-                Console.WriteLine($"AdvSimd.IsSupported : {AdvSimd.IsSupported}");
-
-                Assert.That(isAdvSimdDisabled, Is.EqualTo(!AdvSimd.IsSupported));
-                break;
+        if (RuntimeInformation.ProcessArchitecture == Architecture.X64 && Environment.GetEnvironmentVariable("DOTNET_EnableAVX2") == "0")
+        {
+            Assert.That(Sse2.IsSupported, Is.True);
+            Assert.That(Sse41.IsSupported, Is.True);
+            Assert.That(Avx2.IsSupported, Is.False);
         }
     }
 }

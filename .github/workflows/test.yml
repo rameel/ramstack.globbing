@@ -38,28 +38,22 @@ jobs:
       - name: Test (Release)
         run: dotnet test -c Release --no-build
 
-      - name: Test (Debug, Avx2=0)
+      - name: Test (Debug, AVX2=0)
         env:
           DOTNET_EnableAVX2: "0"
         run: dotnet test -c Debug --no-build
 
-      - name: Test (Release, Avx2=0)
+      - name: Test (Release, AVX2=0)
         env:
           DOTNET_EnableAVX2: "0"
         run: dotnet test -c Release --no-build
 
-      - name: Test (Debug, Sse2=0, Sse41=0, Avx2=0, AdvSimd=0)
+      - name: Test (Debug, HWIntrinsic=0)
         env:
-          DOTNET_EnableSSE2: "0"
-          DOTNET_EnableSSE41: "0"
-          DOTNET_EnableAVX2: "0"
-          DOTNET_EnableAdvSimd: "0"
+          DOTNET_EnableHWIntrinsic: "0"
         run: dotnet test -c Debug --no-build
 
-      - name: Test (Release, Sse2=0, Sse41=0, Avx2=0, AdvSimd=0)
+      - name: Test (Release, HWIntrinsic=0)
         env:
-          DOTNET_EnableSSE2: "0"
-          DOTNET_EnableSSE41: "0"
-          DOTNET_EnableAVX2: "0"
-          DOTNET_EnableAdvSimd: "0"
+          DOTNET_EnableHWIntrinsic: "0"
         run: dotnet test -c Release --no-build
