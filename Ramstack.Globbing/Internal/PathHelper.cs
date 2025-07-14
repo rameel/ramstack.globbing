@@ -334,7 +334,7 @@ internal static class PathHelper
 
             while ((int)_position < length)
             {
-                if ((Avx2.IsSupported || Sse2.IsSupported || AdvSimd.IsSupported) && _mask != 0)
+                if ((Avx2.IsSupported || Sse2.IsSupported || AdvSimd.Arm64.IsSupported) && _mask != 0)
                 {
                     var offset = BitOperations.TrailingZeroCount(_mask);
                     if (AdvSimd.IsSupported)
@@ -446,8 +446,7 @@ internal static class PathHelper
                     if (_mask == 0)
                         _position += Vector128<ushort>.Count;
                 }
-                #if NET7_0_OR_GREATER
-                else if (AdvSimd.IsSupported && (int)_position + Vector128<ushort>.Count <= length)
+                else if (AdvSimd.Arm64.IsSupported && (int)_position + Vector128<ushort>.Count <= length)
                 {
                     var chunk = LoadVector128(ref source, _position);
                     var backslashMask = CreateBackslash128Bitmask(flags);
@@ -466,15 +465,24 @@ internal static class PathHelper
                     // This avoids reloading SIMD registers and repeating comparisons
                     // on the same chunk of data.
                     //
-                    _mask = comparison.ExtractMostSignificantBits();
+                    _mask = ExtractMostSignificantBits(comparison);
 
                     //
                     // Advance position to the next chunk when no separators found
                     //
                     if (_mask == 0)
                         _position += Vector128<ushort>.Count;
+
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    static uint ExtractMostSignificantBits(Vector128<ushort> v)
+                    {
+                        var sum = AdvSimd.Arm64.AddAcross(
+                            AdvSimd.ShiftLogical(
+                                AdvSimd.And(v, Vector128.Create((ushort)0x8000)),
+                                Vector128.Create((short)-15, -14, -13, -12, -11, -10, -9, -8)));
+                        return sum.ToScalar();
+                    }
                 }
-                #endif
                 else
                 {
                     for (; (int)_position < length; _position++)
