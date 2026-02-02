@@ -57,7 +57,7 @@ namespace Ramstack.Globbing;
 public static unsafe class Matcher
 {
     /// <summary>
-    /// Represents a marker structure that is used to indicate that the '\' character
+    /// Represents a marker structure used to indicate that the '\' character
     /// should be treated as an escape character in the context of glob pattern processing.
     /// This enables the JIT compiler to generate optimized versions of functions
     /// for different options, enhancing performance.
@@ -65,7 +65,7 @@ public static unsafe class Matcher
     private readonly struct Unix;
 
     /// <summary>
-    /// Represents a marker structure that is used to indicate that the escape character '\'
+    /// Represents a marker structure used to indicate that the escape character '\'
     /// should not be treated as an escape character, but as a path separator instead,
     /// in the context of glob pattern processing.
     /// This enables the JIT compiler to generate optimized versions of functions
@@ -257,7 +257,7 @@ public static unsafe class Matcher
                 // 2. At any deeper level (level > 0), an empty segment indicates that a required directory or file is missing,
                 //    making the path invalid for patterns expecting something at that level.
                 //
-                // For example:
+                // For example
                 //   Pattern: "*/*"    and path: "a" - This pattern requires at least one directory level, so "a" is not a match.
                 //   Pattern: "*/{,b}" and path: "a" - Similarly, this pattern requires a directory or a specific file ("b")
                 //                                     at the next level, so "a" doesn't match.
@@ -356,10 +356,11 @@ public static unsafe class Matcher
 
                 case '*':
                 {
-                    // *** --> *
+                    // *** => *
                     // Treats consecutive stars as one
+                    // ReSharper disable once RedundantJumpStatement
                     while (++p < pend && p[0] == '*')
-                        continue; // ReSharper disable once RedundantJumpStatement
+                        continue;
 
                     // Trailing '*' matches everything
                     if (p == pend)
