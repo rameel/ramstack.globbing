@@ -138,6 +138,7 @@ partial class Files
         // This method is 47 bytes of IL code consisting solely of calls (6 calls),
         // and JIT refuses to inline it, even though the x86-64 output results
         // in a small set of instructions.
+
         return entry.Directory.Length - entry.RootDirectory.Length + entry.FileName.Length + 1;
     }
 
@@ -146,7 +147,7 @@ partial class Files
         // To enable escaping in Windows systems, we convert backslashes (\) to forward slashes (/).
         // This is safe because in Windows, backslashes are only used as path separators.
         // Otherwise, the backslash (\) in the path will be treated as an escape character,
-        // and as a result, the `Unix` flag will essentially not work on a Windows system.
+        // and as a result, the MatchFlags.Unix flag will essentially not work on a Windows system.
         if (Path.DirectorySeparatorChar == '\\' && flags == MatchFlags.Unix)
             PathHelper.ConvertPathToPosixStyle(path);
     }

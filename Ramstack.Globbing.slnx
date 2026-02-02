@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Ramstack.Globbing.Tests/Ramstack.Globbing.Tests.csproj" />
+  <Project Path="Ramstack.Globbing/Ramstack.Globbing.csproj" />
+</Solution>
