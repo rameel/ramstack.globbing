@@ -753,7 +753,7 @@ public static class DirectoryInfoExtensions
 
     private static IEnumerable<FileInfo> EnumerateFiles(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
-        flags = Files.AdjustMatchFlags(flags);
+        flags = Files.ResolveMatchFlags(flags);
 
         return new FileSystemEnumerable<FileInfo>(path, (ref entry) => (FileInfo)entry.ToFileSystemInfo(), options)
         {
@@ -764,7 +764,7 @@ public static class DirectoryInfoExtensions
 
     private static IEnumerable<DirectoryInfo> EnumerateDirectories(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
-        flags = Files.AdjustMatchFlags(flags);
+        flags = Files.ResolveMatchFlags(flags);
 
         return new FileSystemEnumerable<DirectoryInfo>(path, (ref entry) => (DirectoryInfo)entry.ToFileSystemInfo(), options)
         {
@@ -775,7 +775,7 @@ public static class DirectoryInfoExtensions
 
     private static IEnumerable<FileSystemInfo> EnumerateInfos(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
-        flags = Files.AdjustMatchFlags(flags);
+        flags = Files.ResolveMatchFlags(flags);
 
         return new FileSystemEnumerable<FileSystemInfo>(path, (ref entry) => entry.ToFileSystemInfo(), options)
         {

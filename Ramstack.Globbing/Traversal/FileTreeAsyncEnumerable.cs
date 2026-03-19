@@ -86,7 +86,7 @@ public sealed class FileTreeAsyncEnumerable<TEntry, TResult> : IAsyncEnumerable<
     {
         try
         {
-            var flags = Files.AdjustMatchFlags(Flags);
+            var flags = Files.ResolveMatchFlags(Flags);
             var chars = ArrayPool<char>.Shared.Rent(FileTreeEnumerable<TEntry, TResult>.DefaultBufferCapacity);
 
             var queue = new Queue<(TEntry Directory, string Path)>();

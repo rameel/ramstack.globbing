@@ -88,15 +88,16 @@ partial class Files
     }
 
     /// <summary>
-    /// Adjusts the provided match flags based on the current operating system's directory separator character.
+    /// Resolves the provided match flags by converting <see cref="MatchFlags.Auto"/>
+    /// to a concrete value based on the current operating system's directory separator convention.
     /// </summary>
     /// <param name="flags">The initial match flags to resolve.</param>
     /// <returns>
-    /// The adjusted match flags. If the initial flags are <see cref="MatchFlags.Auto"/>, the method returns
-    /// <see cref="MatchFlags.Windows"/> for Windows systems and <see cref="MatchFlags.Unix"/> for Unix-like systems;
-    /// otherwise, it returns the provided flags.
+    /// The resolved match flags. If the input is <see cref="MatchFlags.Auto"/>, returns
+    /// <see cref="MatchFlags.Windows"/> on Windows systems and <see cref="MatchFlags.Unix"/>
+    /// on Unix-like systems. Otherwise, returns the original flags unchanged.
     /// </returns>
-    internal static MatchFlags AdjustMatchFlags(MatchFlags flags)
+    internal static MatchFlags ResolveMatchFlags(MatchFlags flags)
     {
         if (flags == MatchFlags.Auto)
             return Path.DirectorySeparatorChar == '\\'

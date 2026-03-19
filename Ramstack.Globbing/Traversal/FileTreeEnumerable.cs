@@ -77,7 +77,7 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
 
     private IEnumerable<TResult> Enumerate()
     {
-        var flags = Files.AdjustMatchFlags(Flags);
+        var flags = Files.ResolveMatchFlags(Flags);
         var chars = ArrayPool<char>.Shared.Rent(DefaultBufferCapacity);
         var queue = new Queue<(TEntry Directory, string Path)>();
         queue.Enqueue((_directory, ""));

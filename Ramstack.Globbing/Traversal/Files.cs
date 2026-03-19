@@ -753,7 +753,7 @@ public static partial class Files
 
     private static IEnumerable<string> EnumerateEntries(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
-        flags = AdjustMatchFlags(flags);
+        flags = ResolveMatchFlags(flags);
 
         return new FileSystemEnumerable<string>(Path.GetFullPath(path), (ref entry) => entry.ToFullPath(), options)
         {
