@@ -77,8 +77,8 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
 
     private IEnumerable<TResult> Enumerate()
     {
+        var flags = Files.AdjustMatchFlags(Flags);
         var chars = ArrayPool<char>.Shared.Rent(DefaultBufferCapacity);
-
         var queue = new Queue<(TEntry Directory, string Path)>();
         queue.Enqueue((_directory, ""));
 
@@ -89,15 +89,15 @@ public sealed class FileTreeEnumerable<TEntry, TResult> : IEnumerable<TResult>
                 var name = FileNameSelector(entry);
                 var fullName = FileTreeHelper.GetFullName(ref chars, e.Path, name);
 
-                if (PathHelper.IsMatch(fullName, Excludes, Flags))
+                if (PathHelper.IsMatch(fullName, Excludes, flags))
                     continue;
 
                 if (ShouldRecursePredicate == null || ShouldRecursePredicate(entry))
-                    if (PathHelper.IsPartialMatch(fullName, Patterns, Flags))
+                    if (PathHelper.IsPartialMatch(fullName, Patterns, flags))
                         queue.Enqueue((entry, fullName.ToString()));
 
                 if (ShouldIncludePredicate == null || ShouldIncludePredicate(entry))
-                    if (PathHelper.IsMatch(fullName, Patterns, Flags))
+                    if (PathHelper.IsMatch(fullName, Patterns, flags))
                         yield return ResultSelector(entry);
             }
         }
