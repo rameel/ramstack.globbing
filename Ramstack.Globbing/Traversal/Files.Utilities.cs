@@ -21,7 +21,9 @@ partial class Files
     /// <param name="entry">A file system entry reference.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of files.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude files.</param>
-    /// <param name="flags">The matching options to use.</param>
+    /// <param name="flags">The matching options to use.
+    /// This parameter must be explicitly set to either <see cref="MatchFlags.Windows"/> or <see cref="MatchFlags.Unix"/>.
+    /// <see cref="MatchFlags.Auto"/> is not allowed and will result in an assertion failure.</param>
     /// <param name="target">The search target.</param>
     /// <returns>
     /// <see langword="true" /> if the specified file system entry should be included in the results;
@@ -29,6 +31,8 @@ partial class Files
     /// </returns>
     internal static bool ShouldInclude(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target)
     {
+        Debug.Assert(flags != MatchFlags.Auto);
+
         char[]? rented = null;
 
         var current = entry.IsDirectory
@@ -60,13 +64,17 @@ partial class Files
     /// <param name="entry">A file system entry reference.</param>
     /// <param name="patterns">An array of glob patterns to match against the names of files.</param>
     /// <param name="excludes">Optional array of glob patterns to exclude files.</param>
-    /// <param name="flags">The matching options to use. Default is <see cref="MatchFlags.Auto"/>.</param>
+    /// <param name="flags">The matching options to use.
+    /// This parameter must be explicitly set to either <see cref="MatchFlags.Windows"/> or <see cref="MatchFlags.Unix"/>.
+    /// <see cref="MatchFlags.Auto"/> is not allowed and will result in an assertion failure.</param>
     /// <returns>
     /// <see langword="true" /> if the specified directory entry should be recursed into;
     /// otherwise, <see langword="false" />.
     /// </returns>
     internal static bool ShouldRecurse(ref FileSystemEntry entry, string[] patterns, string[] excludes, MatchFlags flags)
     {
+        Debug.Assert(flags != MatchFlags.Auto);
+
         char[]? rented = null;
 
         var length = GetRelativePathLength(ref entry);
@@ -145,6 +153,8 @@ partial class Files
 
     private static void UpdatePathSeparators(scoped Span<char> path, MatchFlags flags)
     {
+        Debug.Assert(flags != MatchFlags.Auto);
+
         // To enable escaping in Windows systems, we convert backslashes (\) to forward slashes (/).
         // This is safe because in Windows, backslashes are only used as path separators.
         // Otherwise, the backslash (\) in the path will be treated as an escape character,
