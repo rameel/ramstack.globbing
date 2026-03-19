@@ -21,13 +21,17 @@ internal static class PathHelper
     /// </summary>
     /// <param name="path">The path to match for a match.</param>
     /// <param name="patterns">An array of patterns to match against the path.</param>
-    /// <param name="flags">The matching options to use.</param>
+    /// <param name="flags">The matching options to use.
+    /// This parameter must be explicitly set to either <see cref="MatchFlags.Windows"/> or <see cref="MatchFlags.Unix"/>.
+    /// <see cref="MatchFlags.Auto"/> is not allowed and will result in an assertion failure.</param>
     /// <returns>
     /// <see langword="true" /> if the path matches any of the patterns;
     /// otherwise, <see langword="false" />.
     /// </returns>
     public static bool IsMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
     {
+        Debug.Assert(flags != MatchFlags.Auto);
+
         foreach (var pattern in patterns)
             if (Matcher.IsMatch(path, pattern, flags))
                 return true;
@@ -40,13 +44,17 @@ internal static class PathHelper
     /// </summary>
     /// <param name="path">The path to be partially matched.</param>
     /// <param name="patterns">An array of patterns to match against the path.</param>
-    /// <param name="flags">The matching options to use.</param>
+    /// <param name="flags">The matching options to use.
+    /// This parameter must be explicitly set to either <see cref="MatchFlags.Windows"/> or <see cref="MatchFlags.Unix"/>.
+    /// <see cref="MatchFlags.Auto"/> is not allowed and will result in an assertion failure.</param>
     /// <returns>
     /// <see langword="true" /> if the path partially matches any of the patterns;
     /// otherwise, <see langword="false" />.
     /// </returns>
     public static bool IsPartialMatch(ReadOnlySpan<char> path, string[] patterns, MatchFlags flags)
     {
+        Debug.Assert(flags != MatchFlags.Auto);
+
         var count = CountPathSegments(path, flags);
 
         foreach (var pattern in patterns)
@@ -60,12 +68,16 @@ internal static class PathHelper
     /// Counts the number of segments in the specified path.
     /// </summary>
     /// <param name="path">The path to count segments for.</param>
-    /// <param name="flags">The flags indicating the type of path separators to match.</param>
+    /// <param name="flags">The flags indicating the type of path separators to match.
+    /// This parameter must be explicitly set to either <see cref="MatchFlags.Windows"/> or <see cref="MatchFlags.Unix"/>.
+    /// <see cref="MatchFlags.Auto"/> is not allowed and will result in an assertion failure.</param>
     /// <returns>
     /// The number of segments in the path.
     /// </returns>
     public static int CountPathSegments(scoped ReadOnlySpan<char> path, MatchFlags flags)
     {
+        Debug.Assert(flags != MatchFlags.Auto);
+
         var count = 0;
         var iterator = new PathSegmentIterator();
         ref var s = ref Unsafe.AsRef(in MemoryMarshal.GetReference(path));
@@ -92,13 +104,16 @@ internal static class PathHelper
     /// Returns a partial pattern from the specified pattern string based on the specified depth.
     /// </summary>
     /// <param name="pattern">The pattern string to extract from.</param>
-    /// <param name="flags">The flags indicating the type of path separators to match.</param>
+    /// <param name="flags">The flags indicating the type of path separators to match.
+    /// This parameter must be explicitly set to either <see cref="MatchFlags.Windows"/> or <see cref="MatchFlags.Unix"/>.
+    /// <see cref="MatchFlags.Auto"/> is not allowed and will result in an assertion failure.</param>
     /// <param name="depth">The depth level to extract the partial pattern up to.</param>
     /// <returns>
     /// A <see cref="ReadOnlySpan{T}"/> representing the partial pattern.
     /// </returns>
     public static ReadOnlySpan<char> GetPartialPattern(string pattern, MatchFlags flags, int depth)
     {
+        Debug.Assert(flags != MatchFlags.Auto);
         Debug.Assert(depth >= 1);
 
         if (depth < 1)
@@ -227,12 +242,16 @@ internal static class PathHelper
     /// <summary>
     /// Creates a 256-bit bitmask that allows escaping characters based on the specified flags.
     /// </summary>
-    /// <param name="flags">The flags indicating the type of path separators to match.</param>
+    /// <param name="flags">The flags indicating the type of path separators to match.
+    /// This parameter must be explicitly set to either <see cref="MatchFlags.Windows"/> or <see cref="MatchFlags.Unix"/>.
+    /// <see cref="MatchFlags.Auto"/> is not allowed and will result in an assertion failure.</param>
     /// <returns>
     /// A 256-bit bitmask for escaping characters.
     /// </returns>
     private static Vector256<ushort> CreateBackslash256Bitmask(MatchFlags flags)
     {
+        Debug.Assert(flags != MatchFlags.Auto);
+
         var mask = Vector256<ushort>.Zero;
         if (flags == MatchFlags.Windows)
             mask = Vector256<ushort>.AllBitsSet;
@@ -243,12 +262,16 @@ internal static class PathHelper
     /// <summary>
     /// Creates a 128-bit bitmask that allows escaping characters based on the specified flags.
     /// </summary>
-    /// <param name="flags">The flags indicating the type of path separators to match.</param>
+    /// <param name="flags">The flags indicating the type of path separators to match.
+    /// This parameter must be explicitly set to either <see cref="MatchFlags.Windows"/> or <see cref="MatchFlags.Unix"/>.
+    /// <see cref="MatchFlags.Auto"/> is not allowed and will result in an assertion failure.</param>
     /// <returns>
     /// A 128-bit bitmask for escaping characters.
     /// </returns>
     private static Vector128<ushort> CreateBackslash128Bitmask(MatchFlags flags)
     {
+        Debug.Assert(flags != MatchFlags.Auto);
+
         var mask = Vector128<ushort>.Zero;
         if (flags == MatchFlags.Windows)
             mask = Vector128<ushort>.AllBitsSet;
