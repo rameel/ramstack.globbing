@@ -35,3 +35,6 @@ obj/
 
 #Ignore Rider/Idea files
 .idea/
+
+# Ignore BenchmarkDotNet artifacts
+BenchmarkDotNet.Artifacts
