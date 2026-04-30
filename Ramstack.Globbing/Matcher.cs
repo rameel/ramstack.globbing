@@ -134,25 +134,34 @@ public static unsafe class Matcher
     /// </returns>
     public static bool IsMatch(scoped ReadOnlySpan<char> path, scoped ReadOnlySpan<char> pattern, MatchFlags flags = MatchFlags.Auto)
     {
-        return IsMatchImpl(
+        Debug.Assert((int)MatchFlags.Auto == 0);
+        Debug.Assert((int)MatchFlags.Windows == 2);
+        Debug.Assert((int)MatchFlags.Unix == 4);
+
+        if (Path.DirectorySeparatorChar == '\\' ? ((int)flags & (int)~MatchFlags.Windows) == 0 : flags == MatchFlags.Windows)
+        {
+            return IsMatchImpl<Windows>(
+                ref MemoryMarshal.GetReference(path),
+                path.Length,
+                ref MemoryMarshal.GetReference(pattern),
+                pattern.Length);
+        }
+
+        return IsMatchImpl<Unix>(
             ref MemoryMarshal.GetReference(path),
             path.Length,
             ref MemoryMarshal.GetReference(pattern),
-            pattern.Length,
-            flags);
+            pattern.Length);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        static bool IsMatchImpl(ref char rv, int vlen, ref char rp, int plen, MatchFlags flags)
+        static bool IsMatchImpl<TFlags>(ref char rv, int vlen, ref char rp, int plen)
         {
             fixed (char* v = &rv, p = &rp)
             {
                 var vend = v + (uint)vlen;
                 var pend = p + (uint)plen;
 
-                if (flags == MatchFlags.Windows || flags == MatchFlags.Auto && Path.DirectorySeparatorChar == '\\')
-                    return DoMatch<Windows>(p, pend, v, vend) == vend;
-
-                return DoMatch<Unix>(p, pend, v, vend) == vend;
+                return DoMatch<TFlags>(p, pend, v, vend) == vend;
             }
         }
 
