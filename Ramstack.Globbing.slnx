@@ -1,9 +1,12 @@
 <Solution>
-  <Folder Name="/Solution Items/">
+  <Folder Name="/.global/">
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
     <File Path="LICENSE" />
     <File Path="README.md" />
+  </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Ramstack.Globbing.Benchmarks/Ramstack.Globbing.Benchmarks.csproj" />
   </Folder>
   <Project Path="Ramstack.Globbing.Tests/Ramstack.Globbing.Tests.csproj" />
   <Project Path="Ramstack.Globbing/Ramstack.Globbing.csproj" />

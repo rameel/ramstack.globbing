@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+using Ramstack.Globbing.Internal;
+
 namespace Ramstack.Globbing;
 
 /// <summary>
@@ -132,39 +134,38 @@ public static unsafe class Matcher
     /// <returns>
     /// <see langword="true" /> if the pattern matches the path; otherwise, <see langword="false" />.
     /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsMatch(scoped ReadOnlySpan<char> path, scoped ReadOnlySpan<char> pattern, MatchFlags flags = MatchFlags.Auto)
     {
-        return IsMatchImpl(
+        Debug.Assert((int)MatchFlags.Auto == 0);
+        Debug.Assert((int)MatchFlags.Windows == 2);
+        Debug.Assert((int)MatchFlags.Unix == 4);
+
+        if (Path.DirectorySeparatorChar == '\\' ? ((int)flags & (int)~MatchFlags.Windows) == 0 : flags == MatchFlags.Windows)
+        {
+            return IsMatchImpl<Windows>(
+                ref MemoryMarshal.GetReference(path),
+                path.Length,
+                ref MemoryMarshal.GetReference(pattern),
+                pattern.Length);
+        }
+
+        return IsMatchImpl<Unix>(
             ref MemoryMarshal.GetReference(path),
             path.Length,
             ref MemoryMarshal.GetReference(pattern),
-            pattern.Length,
-            flags);
+            pattern.Length);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        static bool IsMatchImpl(ref char rv, int vlen, ref char rp, int plen, MatchFlags flags)
+        static bool IsMatchImpl<TFlags>(ref char rv, int vlen, ref char rp, int plen)
         {
             fixed (char* v = &rv, p = &rp)
             {
                 var vend = v + (uint)vlen;
                 var pend = p + (uint)plen;
 
-                if (flags == MatchFlags.Windows || flags == MatchFlags.Auto && Path.DirectorySeparatorChar == '\\')
-                    return DoMatch<Windows>(p, pend, v, vend) == vend;
-
-                return DoMatch<Unix>(p, pend, v, vend) == vend;
+                return DoMatch<TFlags>(p, pend, v, vend) == vend;
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static int Length(char* s, char* e)
-        {
-            Debug.Assert((nint)s <= (nint)e);
-
-            // C# emits suboptimal code for the e - s operation in our case.
-            // However, since the condition s <= e is always true in our case,
-            // we can assist the JIT in generating efficient code.
-            return (int)(((nint)e - (nint)s) >>> 1);
         }
 
         // Advances the pointer past any slash characters
@@ -180,17 +181,12 @@ public static unsafe class Matcher
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static char* FindNextSlash<TFlags>(char* p, char* pend)
         {
-            if (p < pend)
-            {
-                var n = Length(p, pend);
-                var s = MemoryMarshal.CreateSpan(ref *p, n);
-                var r = typeof(TFlags) == typeof(Windows)
-                    ? s.IndexOfAny('/', '\\')
-                    : s.IndexOf('/');
+            var r = typeof(TFlags) == typeof(Windows)
+                ? MemoryHelper.IndexOfAny(p, pend, '/', '\\')
+                : MemoryHelper.IndexOf(p, pend, '/');
 
-                if (r >= 0)
-                    return p + (uint)r;
-            }
+            if (r >= 0)
+                return p + (uint)r;
 
             return pend;
         }
@@ -366,8 +362,42 @@ public static unsafe class Matcher
                     if (p == pend)
                         return vend;
 
+                    // OPTIMIZATION:
+                    // Try to identify a fast-forward opportunity after '*' by inspecting the next pattern character.
+                    // If the next character is a plain literal (not a wildcard or special construct),
+                    // we can skip naive backtracking and jump directly to its next occurrence in the input.
+                    //
+                    // This reduces the number of recursive calls by skipping intermediate positions
+                    // that cannot possibly match, effectively replacing blind linear backtracking
+                    // with a guided search.
+                    //
+                    // For non-literal tokens ('?', '[', '{', '\'), we fall back to the original behavior
+                    // to preserve correctness.
+
+                    // Note: '*' is intentionally not included here, as consecutive '*' are collapsed above,
+                    // so the next pattern character is guaranteed not to be '*'.
+                    const long Mask =
+                        1L << ('?'  - 63) | // 63
+                        1L << ('['  - 63) | // 91
+                        1L << ('\\' - 63) | // 92
+                        1L << ('{'  - 63);  // 123
+
+                    var lookup = p[0] - 63;
+
                     while (true)
                     {
+                        if ((uint)lookup > 60 || ((1L << lookup) & Mask) == 0)
+                        {
+                            var n = MemoryHelper.IndexOf(v, vend, p[0]);
+                            if (n < 0)
+                            {
+                                v = vend;
+                                break;
+                            }
+
+                            v += (uint)n;
+                        }
+
                         var r = DoMatchSegment(p, pend, v, vend, subpattern);
                         if (r != null)
                             return r;
@@ -376,6 +406,7 @@ public static unsafe class Matcher
                             break;
                     }
 
+                    // OPTIMIZATION:
                     // Aborting recursion when failing
                     //
                     // To prevent quadratic behavior in scenarios like the pattern "a*a*a*a*c"
@@ -404,7 +435,7 @@ public static unsafe class Matcher
 
                 default:
                 {
-                    if (p[0] != '?' && p[0] != v[0])
+                    if (p[0] != v[0] && p[0] != '?')
                         return null;
 
                     p++;
