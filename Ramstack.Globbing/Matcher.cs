@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+using Ramstack.Globbing.Internal;
+
 namespace Ramstack.Globbing;
 
 /// <summary>
@@ -165,17 +167,6 @@ public static unsafe class Matcher
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static int Length(char* s, char* e)
-        {
-            Debug.Assert((nint)s <= (nint)e);
-
-            // C# emits suboptimal code for the e - s operation in our case.
-            // However, since the condition s <= e is always true in our case,
-            // we can assist the JIT in generating efficient code.
-            return (int)(((nint)e - (nint)s) >>> 1);
-        }
-
         // Advances the pointer past any slash characters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static char* SkipSlash<TFlags>(char* p, char* pend)
@@ -189,17 +180,12 @@ public static unsafe class Matcher
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static char* FindNextSlash<TFlags>(char* p, char* pend)
         {
-            if (p < pend)
-            {
-                var n = Length(p, pend);
-                var s = MemoryMarshal.CreateSpan(ref *p, n);
-                var r = typeof(TFlags) == typeof(Windows)
-                    ? s.IndexOfAny('/', '\\')
-                    : s.IndexOf('/');
+            var r = typeof(TFlags) == typeof(Windows)
+                ? MemoryHelper.IndexOfAny(p, pend, '/', '\\')
+                : MemoryHelper.IndexOf(p, pend, '/');
 
-                if (r >= 0)
-                    return p + (uint)r;
-            }
+            if (r >= 0)
+                return p + (uint)r;
 
             return pend;
         }
