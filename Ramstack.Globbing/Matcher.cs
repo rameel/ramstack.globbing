@@ -134,6 +134,7 @@ public static unsafe class Matcher
     /// <returns>
     /// <see langword="true" /> if the pattern matches the path; otherwise, <see langword="false" />.
     /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsMatch(scoped ReadOnlySpan<char> path, scoped ReadOnlySpan<char> pattern, MatchFlags flags = MatchFlags.Auto)
     {
         Debug.Assert((int)MatchFlags.Auto == 0);
@@ -361,8 +362,42 @@ public static unsafe class Matcher
                     if (p == pend)
                         return vend;
 
+                    // OPTIMIZATION:
+                    // Try to identify a fast-forward opportunity after '*' by inspecting the next pattern character.
+                    // If the next character is a plain literal (not a wildcard or special construct),
+                    // we can skip naive backtracking and jump directly to its next occurrence in the input.
+                    //
+                    // This reduces the number of recursive calls by skipping intermediate positions
+                    // that cannot possibly match, effectively replacing blind linear backtracking
+                    // with a guided search.
+                    //
+                    // For non-literal tokens ('?', '[', '{', '\'), we fall back to the original behavior
+                    // to preserve correctness.
+
+                    // Note: '*' is intentionally not included here, as consecutive '*' are collapsed above,
+                    // so the next pattern character is guaranteed not to be '*'.
+                    const long Mask =
+                        1L << ('?'  - 63) | // 63
+                        1L << ('['  - 63) | // 91
+                        1L << ('\\' - 63) | // 92
+                        1L << ('{'  - 63);  // 123
+
+                    var lookup = p[0] - 63;
+
                     while (true)
                     {
+                        if ((uint)lookup > 60 || ((1L << lookup) & Mask) == 0)
+                        {
+                            var n = MemoryHelper.IndexOf(v, vend, p[0]);
+                            if (n < 0)
+                            {
+                                v = vend;
+                                break;
+                            }
+
+                            v += (uint)n;
+                        }
+
                         var r = DoMatchSegment(p, pend, v, vend, subpattern);
                         if (r != null)
                             return r;
@@ -371,6 +406,7 @@ public static unsafe class Matcher
                             break;
                     }
 
+                    // OPTIMIZATION:
                     // Aborting recursion when failing
                     //
                     // To prevent quadratic behavior in scenarios like the pattern "a*a*a*a*c"
@@ -399,7 +435,7 @@ public static unsafe class Matcher
 
                 default:
                 {
-                    if (p[0] != '?' && p[0] != v[0])
+                    if (p[0] != v[0] && p[0] != '?')
                         return null;
 
                     p++;
