@@ -19,6 +19,16 @@ bool result = Matcher.IsMatch("wiki/section-1/start.md", "wiki/**/*.md");
 ```
 The `IsMatch` method attempts to match the specified path against the provided wildcard pattern.
 
+Matching is **case-sensitive**.
+
+`Matcher.IsMatch` compares path strings as-is and treats both `path` and `pattern` as **relative paths** in the same logical namespace.
+Absolute or rooted-looking strings are not handled specially: leading and trailing separators are ignored, so they are matched the same way as relative paths.
+
+The `.` and `..` segments have no special meaning and are matched as ordinary path segments.
+Parent-directory navigation is not supported.
+
+Matching APIs are **thread-safe** and can be used concurrently from multiple threads.
+
 By default, the system's default path separators are used. You can override this behavior by specifying one of the following flags:
 
 | Name    | Description                                                                                                                                                                                                                            |
@@ -80,6 +90,9 @@ When using `MatchFlags.Unix`, an additional escape character (`\`) is available:
 ## Notes
 * Leading and trailing path separators are ignored.
 * Consecutive path separators are counted as one separator.
+* Matching is case-sensitive.
+* `Matcher.IsMatch` treats both `path` and `pattern` as relative paths. Absolute or rooted-looking strings are not handled specially.
+* The `.` and `..` segments are treated as ordinary path segments; parent-directory navigation is not supported.
 
 ### Special cases
 * At the root level, an empty path segment is valid, which can be represented by patterns like "*".
@@ -117,6 +130,9 @@ var files = Files.EnumerateFiles(@"/path/to/directory", "**/*.cs", "tests");
 foreach (var file in files)
     Console.WriteLine(file);
 ```
+Here, the first argument is the traversal root, while the glob patterns are matched against the **relative path from that root**.
+For example, `**/*.cs` matches `src/app.cs`, not `/path/to/directory/src/app.cs`.
+
 Support for multiple patterns is also included:
 
 ```csharp
@@ -186,6 +202,7 @@ var enumeration = new FileTreeEnumerable<FileSystemInfo, string>(root)
 foreach (string filePath in enumeration)
     Console.WriteLine(filePath);
 ```
+`Patterns` and `Excludes` are evaluated against paths relative to the supplied root entry.
 
 ### Asynchronous Enumeration
 The `FileTreeAsyncEnumerable` class provides similar functionality to `FileTreeEnumerable`,
