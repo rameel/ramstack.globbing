@@ -45,6 +45,39 @@ internal static unsafe class MemoryHelper
             }
         }
 
+        if (AdvSimd.Arm64.IsSupported && s + Vector128<short>.Count <= e)
+        {
+            for (;;)
+            {
+                var result = AdvSimd.CompareEqual(
+                    Vector128.Create((short)ch),
+                    LoadVector(s));
+
+                var mask = AdvSimd_ExtractMostSignificantBits(result);
+                if (mask != 0)
+                {
+                    var offset = BitOperations.TrailingZeroCount(mask);
+                    return i + offset;
+                }
+
+                s += Vector128<short>.Count;
+                i += Vector128<short>.Count;
+
+                if (s + Vector128<short>.Count <= e)
+                    continue;
+
+                if (s == e)
+                    return -1;
+
+                //
+                // Tail handling via the same SIMD path (no scalar fallback)
+                //
+                var remaining = (int)((nint)e - (nint)s) >>> 1;
+                i = i + remaining - Vector128<short>.Count;
+                s = e - Vector128<short>.Count;
+            }
+        }
+
         for (; s < e; s++, i++)
             if (*s == ch)
                 return i;
@@ -92,11 +125,55 @@ internal static unsafe class MemoryHelper
             }
         }
 
+        if (AdvSimd.Arm64.IsSupported && s + Vector128<short>.Count <= e)
+        {
+            for (;;)
+            {
+                var source = LoadVector(s);
+                var result = AdvSimd.Or(
+                    AdvSimd.CompareEqual(source, Vector128.Create((short)ch1)),
+                    AdvSimd.CompareEqual(source, Vector128.Create((short)ch2)));
+
+                var mask = AdvSimd_ExtractMostSignificantBits(result);
+                if (mask != 0)
+                {
+                    var offset = BitOperations.TrailingZeroCount(mask);
+                    return i + offset;
+                }
+
+                s += Vector128<short>.Count;
+                i += Vector128<short>.Count;
+
+                if (s + Vector128<short>.Count <= e)
+                    continue;
+
+                if (s == e)
+                    return -1;
+
+                //
+                // Tail handling via the same SIMD path (no scalar fallback)
+                //
+                var remaining = (int)((nint)e - (nint)s) >>> 1;
+                i = i + remaining - Vector128<short>.Count;
+                s = e - Vector128<short>.Count;
+            }
+        }
+
         for (; s < e; s++, i++)
             if (*s == ch1 || *s == ch2)
                 return i;
 
         return -1;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int AdvSimd_ExtractMostSignificantBits(Vector128<short> v)
+    {
+        var sum = AdvSimd.Arm64.AddAcross(
+            AdvSimd.ShiftLogical(
+                AdvSimd.And(v, Vector128.Create(unchecked((short)0x8000))),
+                Vector128.Create(-15, -14, -13, -12, -11, -10, -9, -8)));
+        return sum.ToScalar();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
