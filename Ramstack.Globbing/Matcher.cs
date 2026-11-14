@@ -159,6 +159,12 @@ public static unsafe class Matcher
         [MethodImpl(MethodImplOptions.NoInlining)]
         static bool IsMatchImpl<TFlags>(ref char rv, int vlen, ref char rp, int plen)
         {
+            // An empty span may be backed by a null reference (default, ReadOnlySpan<char>.Empty).
+            // Since null is used internally as the "no match" result, it must never be
+            // the end-of-path pointer, so an empty path is redirected to a valid location.
+            if (vlen == 0)
+                rv = ref MemoryMarshal.GetReference(string.Empty.AsSpan());
+
             fixed (char* v = &rv, p = &rp)
             {
                 var vend = v + (uint)vlen;
