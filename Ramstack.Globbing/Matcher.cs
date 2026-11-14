@@ -498,7 +498,10 @@ public static unsafe class Matcher
             var e = ExtractSubpattern(p, pend);
             var r = DoMatchSegment(p + 1, e, v, vend, subpattern: 1);
 
-            if (r > last)
+            // (char*)-1 is the star-loop abort signal. For an alternative it only means
+            // that this particular alternative doesn't match, so it must not win here:
+            // as an unsigned address it is greater than any valid pointer.
+            if (r > last && r != (char*)-1)
                 last = r;
 
             p = e;
