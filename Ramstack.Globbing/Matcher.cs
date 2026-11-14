@@ -290,16 +290,20 @@ public static unsafe class Matcher
             {
                 case '[':
                 {
-                    // We check an overrun slightly further below
-                    p++;
-
                     var inverse = false;
                     var matched = false;
+
+                    // Malformed
+                    if (++p >= pend)
+                        return null;
 
                     if (p[0] == '!')
                     {
                         inverse = true;
-                        p++;
+
+                        // Malformed
+                        if (++p >= pend)
+                            return null;
                     }
 
                     var a = p[0];
@@ -312,14 +316,13 @@ public static unsafe class Matcher
 
                         var b = a;
 
-                        if (p[0] == '-' && p[1] != ']')
+                        if (p[0] == '-' && p + 1 < pend && p[1] != ']')
                         {
-                            // Malformed
-                            if (++p >= pend)
-                                return null;
+                            b = p[1];
 
-                            b = p[0];
-                            p++;
+                            // Malformed
+                            if ((p += 2) >= pend)
+                                return null;
                         }
 
                         matched |= a <= v[0] & v[0] <= b;
@@ -426,11 +429,17 @@ public static unsafe class Matcher
                 case '\\':
                 {
                     // Invalid escape sequence
-                    if (p == pend)
+                    if (++p >= pend)
+                        return null;
+
+                    // The escaped character is always compared literally,
+                    // so an escaped '?' must not act as a wildcard.
+                    if (p[0] != v[0])
                         return null;
 
                     p++;
-                    goto default;
+                    v++;
+                    break;
                 }
 
                 default:
