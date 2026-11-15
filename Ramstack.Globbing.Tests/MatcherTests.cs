@@ -247,6 +247,13 @@ public class MatcherTests
     [TestCase(@"\[",                 "[",                    ExpectedResult = true)]
     [TestCase(@"\[\?\{name]",        "[?{name]",             ExpectedResult = true)]
     [TestCase(@"\a\b\c\d\e\f",       "abcdef",               ExpectedResult = true)]
+    [TestCase(@"\*",                 "a",                    ExpectedResult = false)]
+    [TestCase(@"\?",                 "?",                    ExpectedResult = true)]
+    [TestCase(@"\?",                 "a",                    ExpectedResult = false)]
+    [TestCase(@"main.\?",            "main.c",               ExpectedResult = false)]
+    [TestCase(@"*\?",                "main?",                ExpectedResult = true)]
+    [TestCase(@"*\?",                "main",                 ExpectedResult = false)]
+    [TestCase(@"a\",                 @"a\",                  ExpectedResult = false)]
 
     [TestCase("[Зз]емля",            "Земля",                ExpectedResult = true)]
     [TestCase("[Зз]емля",            "земля",                ExpectedResult = true)]
@@ -277,6 +284,11 @@ public class MatcherTests
     [TestCase("*{,cs}",              "main.c",               ExpectedResult = true)]
     [TestCase("*{,cs}",              "main.cpp",             ExpectedResult = true)]
     [TestCase("*{,*}",               "main.bak",             ExpectedResult = true)]
+    [TestCase("{*.cs,*.txt}",        "main.cs",              ExpectedResult = true)]
+    [TestCase("{*.cs,*.txt}",        "main.txt",             ExpectedResult = true)]
+    [TestCase("{*.cs,*.txt}",        "main.c",               ExpectedResult = false)]
+    [TestCase("{*a,b}",              "b",                    ExpectedResult = true)]
+    [TestCase("main.{*a,b}",         "main.b",               ExpectedResult = true)]
 
     [TestCase("*.{[a-z],p?[a-z]}",   "main.0",               ExpectedResult = false)]
     [TestCase("*.{[a-z],p?[a-z]}",   "main.pd",              ExpectedResult = false)]
@@ -412,6 +424,65 @@ public class MatcherTests
     [TestCase(@"\a\b\*\d\e",  @"\a\b\c\d\e\f", ExpectedResult = false)]
     public bool IsMatch_Windows(string pattern, string path) =>
         Matcher.IsMatch(path, pattern, MatchFlags.Windows);
+
+    [TestCase("",                     ExpectedResult = true)]
+    [TestCase("*",                    ExpectedResult = true)]
+    [TestCase("**",                   ExpectedResult = true)]
+    [TestCase("{,a}",                 ExpectedResult = true)]
+    [TestCase("abc",                  ExpectedResult = false)]
+    [TestCase("*.cs",                 ExpectedResult = false)]
+    [TestCase("*/*",                  ExpectedResult = false)]
+    [TestCase("{a",                   ExpectedResult = false)]
+    public bool IsMatch_EmptySpanPath(string pattern) =>
+        // ReadOnlySpan<char>.Empty is backed by a null reference
+        Matcher.IsMatch(ReadOnlySpan<char>.Empty, pattern.AsSpan(), MatchFlags.Unix);
+
+    [TestCase("[a-b]",  4, "a")]
+    [TestCase("[a-b]",  4, "b")]
+    [TestCase("[!a]",   2, "a")]
+    [TestCase("[a-]",   3, "a")]
+    [TestCase(@"a\?",   2, "ax")]
+    [TestCase(@"a\b",   2, "ab")]
+    public void IsMatch_PatternSlice_IgnoresCharsBeyondSlice(string text, int length, string path)
+    {
+        var expected = Matcher.IsMatch(path, text[..length], MatchFlags.Unix);
+        var actual = Matcher.IsMatch(path.AsSpan(), text.AsSpan(0, length), MatchFlags.Unix);
+
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [TestCase(MatchFlags.Unix)]
+    [TestCase(MatchFlags.Windows)]
+    public void IsMatch_DoesNotReadBeyondBuffers(MatchFlags flags)
+    {
+        if (!GuardedBuffer.IsSupported)
+            Assert.Ignore("Guard pages are not supported on this platform.");
+
+        // A read past the end of either buffer terminates the test host with an AccessViolationException.
+        string[] patterns =
+        [
+            "", "[", "[!", "[a", "[!a", "[a-", "[!a-", "[a-b", "[a-b]", "[!a-b]", "[a-]",
+            @"\", @"a\", @"\a", @"*\", "*[", "*[a-", "{", "{a", "{a,", "{a,b", "{a,b}", "{*a,b}",
+            "{[a-", "{[a-,b}", "*", "**", "a*", "*a", "?", "**/", "a/**", "**/a", "*/*", "a/[",
+        ];
+
+        string[] paths = ["", "a", "b", "-", "ab", "a/b", "a/", @"a\"];
+
+        Assert.Multiple(() =>
+        {
+            foreach (var pattern in patterns)
+            foreach (var path in paths)
+            {
+                using var p = new GuardedBuffer(pattern);
+                using var v = new GuardedBuffer(path);
+
+                var expected = Matcher.IsMatch(path, pattern, flags);
+                var actual = Matcher.IsMatch(v.Span, p.Span, flags);
+
+                Assert.That(actual, Is.EqualTo(expected), $"pattern: \"{pattern}\", path: \"{path}\"");
+            }
+        });
+    }
 
     [Test]
     public void Bang()

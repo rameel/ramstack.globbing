@@ -159,6 +159,12 @@ public static unsafe class Matcher
         [MethodImpl(MethodImplOptions.NoInlining)]
         static bool IsMatchImpl<TFlags>(ref char rv, int vlen, ref char rp, int plen)
         {
+            // An empty span may be backed by a null reference (default, ReadOnlySpan<char>.Empty).
+            // Since null is used internally as the "no match" result, it must never be
+            // the end-of-path pointer, so an empty path is redirected to a valid location.
+            if (vlen == 0)
+                rv = ref MemoryMarshal.GetReference(string.Empty.AsSpan());
+
             fixed (char* v = &rv, p = &rp)
             {
                 var vend = v + (uint)vlen;
@@ -290,16 +296,20 @@ public static unsafe class Matcher
             {
                 case '[':
                 {
-                    // We check an overrun slightly further below
-                    p++;
-
                     var inverse = false;
                     var matched = false;
+
+                    // Malformed
+                    if (++p >= pend)
+                        return null;
 
                     if (p[0] == '!')
                     {
                         inverse = true;
-                        p++;
+
+                        // Malformed
+                        if (++p >= pend)
+                            return null;
                     }
 
                     var a = p[0];
@@ -312,14 +322,13 @@ public static unsafe class Matcher
 
                         var b = a;
 
-                        if (p[0] == '-' && p[1] != ']')
+                        if (p[0] == '-' && p + 1 < pend && p[1] != ']')
                         {
-                            // Malformed
-                            if (++p >= pend)
-                                return null;
+                            b = p[1];
 
-                            b = p[0];
-                            p++;
+                            // Malformed
+                            if ((p += 2) >= pend)
+                                return null;
                         }
 
                         matched |= a <= v[0] & v[0] <= b;
@@ -426,11 +435,17 @@ public static unsafe class Matcher
                 case '\\':
                 {
                     // Invalid escape sequence
-                    if (p == pend)
+                    if (++p >= pend)
+                        return null;
+
+                    // The escaped character is always compared literally,
+                    // so an escaped '?' must not act as a wildcard.
+                    if (p[0] != v[0])
                         return null;
 
                     p++;
-                    goto default;
+                    v++;
+                    break;
                 }
 
                 default:
@@ -489,7 +504,10 @@ public static unsafe class Matcher
             var e = ExtractSubpattern(p, pend);
             var r = DoMatchSegment(p + 1, e, v, vend, subpattern: 1);
 
-            if (r > last)
+            // (char*)-1 is the star-loop abort signal. For an alternative it only means
+            // that this particular alternative doesn't match, so it must not win here:
+            // as an unsigned address it is greater than any valid pointer.
+            if (r > last && r != (char*)-1)
                 last = r;
 
             p = e;
