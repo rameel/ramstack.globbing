@@ -751,7 +751,7 @@ public static partial class Files
     public static IEnumerable<string> EnumerateFileSystemEntries(string path, string[] patterns, string[]? excludes, TraversalOptions? options) =>
         EnumerateEntries(path, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
 
-    private static IEnumerable<string> EnumerateEntries(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
+    private static FileSystemEnumerable<string> EnumerateEntries(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
         flags = ResolveMatchFlags(flags);
 
