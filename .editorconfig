@@ -30,3 +30,21 @@ csharp_indent_labels = no_change
 
 # IDE0079: Remove unnecessary suppression
 dotnet_remove_unnecessary_suppression_exclusions = category:ReSharper
+
+[Ramstack.Globbing.Tests/**.cs]
+# CA1707: Identifiers should not contain underscores
+# Tests follow the Method_Condition_ExpectedResult naming convention.
+dotnet_diagnostic.CA1707.severity = none
+
+# CA1001: Types that own disposable fields should be disposable
+# Test fixtures release their resources in [OneTimeTearDown] methods, which the rule does not recognize.
+dotnet_diagnostic.CA1001.severity = none
+
+[benchmarks/**.cs]
+# CA1707: Identifiers should not contain underscores
+# Underscores keep the generated BenchmarkDotNet report readable.
+dotnet_diagnostic.CA1707.severity = none
+
+# CA1822: Mark members as static
+# BenchmarkDotNet discovers instance methods and properties.
+dotnet_diagnostic.CA1822.severity = none

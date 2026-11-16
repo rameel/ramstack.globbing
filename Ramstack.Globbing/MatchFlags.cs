@@ -1,8 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Ramstack.Globbing;
 
 /// <summary>
 /// Defines flags that control the behavior of the glob matching process.
 /// </summary>
+[SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix",
+    Justification = "Renaming the public enum would break the public API.")]
 public enum MatchFlags
 {
     /// <summary>

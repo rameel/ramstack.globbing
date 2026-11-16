@@ -751,7 +751,7 @@ public static class DirectoryInfoExtensions
     public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directory, string[] patterns, string[]? excludes, TraversalOptions? options) =>
         EnumerateInfos(directory.FullName, patterns, excludes ?? [], options?.MatchFlags ?? MatchFlags.Auto, SearchTarget.Both, options.ToEnumerationOptions());
 
-    private static IEnumerable<FileInfo> EnumerateFiles(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
+    private static FileSystemEnumerable<FileInfo> EnumerateFiles(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
         flags = Files.ResolveMatchFlags(flags);
 
@@ -762,7 +762,7 @@ public static class DirectoryInfoExtensions
         };
     }
 
-    private static IEnumerable<DirectoryInfo> EnumerateDirectories(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
+    private static FileSystemEnumerable<DirectoryInfo> EnumerateDirectories(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
         flags = Files.ResolveMatchFlags(flags);
 
@@ -773,7 +773,7 @@ public static class DirectoryInfoExtensions
         };
     }
 
-    private static IEnumerable<FileSystemInfo> EnumerateInfos(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
+    private static FileSystemEnumerable<FileSystemInfo> EnumerateInfos(string path, string[] patterns, string[] excludes, MatchFlags flags, SearchTarget target, EnumerationOptions options)
     {
         flags = Files.ResolveMatchFlags(flags);
 
